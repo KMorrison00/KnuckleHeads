@@ -10,7 +10,14 @@ export const createDeck = async (numDecks) => {
             deck_count: numDecks
         }
     })
-    console.log(response.data.deck_id)
-    return response
+    return response.data
 }
 
+export const drawCard = async (deckId) => {
+    const response = await api.get(`${deckId}draw`, {
+        params: {
+            count: 1
+        }
+    })
+    return response.data
+}

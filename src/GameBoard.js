@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {createDeck} from './api'
+import {createDeck, drawCard} from './api'
 
 function GameBoard() {
     useEffect(() => {
