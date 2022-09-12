@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const Layout = styled.div`
+export const CardLayout = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -16,3 +16,9 @@ export const Header = styled.header`
     padding: 16px 0;
 `;
 
+export const PlayerCardGrid = styled.div `
+    display: grid;
+    gap: 10px;
+    grid-template-columns: auto auto auto;
+    grid-template-rows: auto
+`;  
