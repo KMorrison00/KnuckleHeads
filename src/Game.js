@@ -29,14 +29,16 @@ const Game = () => {
 
     return (
           
-          <div className="grid grid-cols-3 grid-rows-3 grid-rows-auto">
+          <div className="grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center">
             <div></div>
             <div>
               <CardGrid />
             </div>
             <div></div>
             <div></div>
-            <div></div>
+            <div className="">
+              <button>Draw</button>
+            </div>
             <div></div>
             <div></div>
             <div>
