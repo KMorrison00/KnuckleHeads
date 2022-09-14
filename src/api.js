@@ -5,13 +5,13 @@ const api = axios.create({
 });
 
 export const createDeck = async (numDecks) => {
+  console.log('MADE A DECK API CALL TO MAKE A DECK')
   const response = await api.get(`new/shuffle/`, {
     params: {
       deck_count: numDecks,
     },
   });
-  console.log(await response.data.deck_id)
-  return response.data.deck_id;
+  return await response.data.deck_id;
 };
 
 export const drawCard = async ({ deckId }) => {

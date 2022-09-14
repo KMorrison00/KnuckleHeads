@@ -2,7 +2,12 @@ import React, {useEffect, useState} from "react";
 import { CardGrid } from "./CardGrid";
 import { Card } from "./Card"
 import CardBack from './CardBack.png'
-import {createDeck, drawCard} from './api'
+import {createDeck, drawCard} from './Api'
+
+export class CardData {
+  cardValue=null;
+  cardImageUrl=CardBack
+}
 
 const Game = () => {
 
@@ -12,9 +17,17 @@ const Game = () => {
     cardValue: null,
     cardImageUrl: CardBack
   })
+  const initGrid = []
+  for (let i = 0; i < 9; i++) {
+    let newCard = new CardData() 
+    initGrid.push(newCard)
+  }
+
   const [discardPile, setDiscardPile] = useState([])
   const [turn, setTurn] = useState('')
   const [deckId, setDeckId] = useState(null);
+  const [p1Cards, setP1Cards] = useState(initGrid.slice());
+  const [p2Cards, setP2Cards] = useState(initGrid.slice());
 
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
@@ -30,10 +43,10 @@ const Game = () => {
       }
       getDeck()
       setTurn('player1')
-      console.log('MADE A DECK')
       console.log(deckId)
     },
-      [] // only on startup
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [] // only on startup 
     )
   
 
@@ -42,7 +55,7 @@ const Game = () => {
             <div className="grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center">
               <div></div>
               <div>
-                <CardGrid />
+                <CardGrid CardList={p2Cards}/>
               </div>
               <div></div>
               <div></div>
@@ -55,7 +68,7 @@ const Game = () => {
               <div></div>
               <div></div>
               <div>
-                <CardGrid />
+                <CardGrid CardList={p1Cards}/>
               </div>
               <div></div>
             </div>
