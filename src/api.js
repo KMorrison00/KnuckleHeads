@@ -10,16 +10,18 @@ export const createDeck = async (numDecks) => {
       deck_count: numDecks,
     },
   });
+  console.log(await response.data.deck_id)
   return response.data.deck_id;
 };
 
 export const drawCard = async ({ deckId }) => {
-  const { data } = await api.get(`${deckId}draw`, {
+  console.log("InsideDrawCardApi", deckId)
+  const { data } = await api.get(`${deckId}/draw`, {
     params: {
       count: 1,
     },
   });
 
-  const { value, image } = data.cards[0];
-  return { deck_id: deckId, value, image };
+  const { code, image } = data.cards[0];
+  return { code, image };
 };
