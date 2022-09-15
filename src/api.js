@@ -1,4 +1,5 @@
 import axios from "axios";
+import CardBack from './CardBack.png'
 
 const api = axios.create({
   baseURL: "https://www.deckofcardsapi.com/api/deck/",
@@ -15,13 +16,20 @@ export const createDeck = async (numDecks) => {
 };
 
 export const drawCard = async ({ deckId }) => {
-  console.log("InsideDrawCardApi", deckId)
-  const { data } = await api.get(`${deckId}/draw`, {
-    params: {
-      count: 1,
-    },
-  });
-
-  const { code, image } = data.cards[0];
-  return { code, image };
+  if (deckId != null) {
+    
+    console.log("InsideDrawCardApi", deckId)
+    const { data } = await api.get(`${deckId}/draw`, {
+      params: {
+        count: 1,
+      },
+    });
+    
+    const { code, image } = data.cards[0];
+    return { code, image };
+  }
+  const code = ''
+  const image = CardBack
+  console.log('TRIED CALLING DRAW CARD WITHOUT A DECK ID')
+  return {code, image}
 };
