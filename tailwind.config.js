@@ -4,7 +4,6 @@ const plugin = require('tailwindcss/plugin')
 const FlipClass = plugin(({addUtilities})=> {
   addUtilities({
     "rotate-y-180": {transform: "rotateY(180deg)"}
-
   })
 })
 module.exports = {

@@ -6,35 +6,31 @@ import {createDeck, drawCard} from './Api'
 import { useFirstRender } from "./Utils";
 
 export class CardData {
-  constructor({cardVal='', cardImageUrl=CardBack, classes='invisible'} = {}) {
-    this.cardValue = cardVal;
+  constructor({cardVal='', cardImageUrl=CardBack} = {}) {
     this.cardImageUrl = cardImageUrl;
-    this.classes = classes;
+    this.cardVal = cardVal;
   }
 }
 
 const Game = () => {
-  
-  const initGrid = []
-  for (let i = 0; i < 9; i++) {
-    let newCard = new CardData() 
-    initGrid.push(newCard)
-  }
-
-  const [discardPile, setDiscardPile] = useState([]);
   const [turn, setTurn] = useState('player1');
   const [deckId, setDeckId] = useState(null);
-  const [p1Cards, setP1Cards] = useState(initGrid.slice());
-  const [p2Cards, setP2Cards] = useState(initGrid.slice());
+  // ADD RESHUFFLING OF DECK AT SOME POINT
+  const [p1Cards, setP1Cards] = useState([[],[],[]]);
+  const [p2Cards, setP2Cards] = useState([[],[],[]]);
   const [choosingGridSpot, setChoosingGridSpot] = useState('');
-  const [card, setCardState] = useState({CardData});
+  
+  const [card, setCardState] = useState(new CardData());
   const players = {'player1': p1Cards, 'player2': p2Cards}
+  const inversePlayerMap = {'player1': ['player2', p2Cards],
+                            'player2': ['player1', p1Cards]}
 
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
     console.log(deckId)
     let {code, image} = await drawCard({deckId: deckId}).catch((e)=> {console.log(e)});
-    setCardState({cardValue: code, cardImageUrl: image})
+    var newCard = new CardData({cardValue: code, cardImageUrl: image, classes:card.classes})
+    setCardState(newCard)
   }
 
   function placeCardInGrid() {
@@ -42,6 +38,7 @@ const Game = () => {
       console.log('trying to place')
     }
   }
+
 
   // STARTUP CODE 
   const didMount = useFirstRender(null);
@@ -52,8 +49,6 @@ const Game = () => {
         setDeckId(deck_id)
       }
       getDeck()
-      let deckCard = new CardData({classes:'visible'})
-      setCardState(deckCard)
       console.log(deckId)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -61,11 +56,13 @@ const Game = () => {
   )
   
 
-  // START OF TURN
+  // Main Game Loop
   useEffect(() => {
     if (didMount) {
       drawCardFromDeck()
       setChoosingGridSpot(true) 
+      // end of turn set to other turn
+      setTurn(inversePlayerMap[turn][0])
     }
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps 
@@ -78,7 +75,7 @@ const Game = () => {
           <div className="grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center">
             <div></div>
             <div>
-              <CardGrid CardList={p2Cards}/>
+              <CardGrid setPlayerCards={setCardState}/>
             </div>
             <div></div>
             <div></div>
@@ -91,7 +88,7 @@ const Game = () => {
             <div></div>
             <div></div>
             <div>
-              <CardGrid CardList={p1Cards}/>
+              <CardGrid setPlayerCards={setCardState}/>
             </div>
             <div></div>
           </div>

@@ -26,6 +26,7 @@ export const drawCard = async ({ deckId }) => {
     });
     
     const { code, image } = data.cards[0];
+    console.log(code)
     return { code, image };
   }
   const code = ''
