@@ -1,0 +1,43 @@
+.gameBoard {
+    z-index: -2;
+}
+
+.glowOutline {
+    background: #053C61;
+    position: relative;
+    border-radius: 8px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.01);
+  }
+.glowOutline::after {
+      position: absolute;
+      content: "";
+      top: 0;
+      z-index: 0;
+      height: 100%;
+      width: 100%;
+      transform: scale(1) translateZ(0);
+      filter: blur(15px);
+      background: linear-gradient(
+        to left,
+        #00ffbf,
+        #49C18F,
+        #39b48e,
+        #089f8f,
+        #08737f,
+        #089f8f,
+        #39b48e,
+        #49C18F,
+        #00ffbf
+      );
+      background-size: 200% 100%;
+      animation: animateGlow 1.25s linear infinite;
+  }
+  
+  @keyframes animateGlow {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 200% 50%;
+    }
+  }

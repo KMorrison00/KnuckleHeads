@@ -13,7 +13,7 @@ export class CardData {
 }
 
 const Game = () => {
-  const [turn, setTurn] = useState('player1');
+  const [turn, setTurn] = useState('player2');
   const [deckId, setDeckId] = useState(null);
   // ADD RESHUFFLING OF DECK AT SOME POINT
   const [p1Cards, setP1Cards] = useState([[],[],[]]);
@@ -77,10 +77,10 @@ const Game = () => {
   
   return (
     <div>
-          <div className="grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center">
+          <div className="gameBoard grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center">
             <div></div>
             <div>
-              <CardGrid setPlayerCards={setCardState}/>
+              <CardGrid setPlayerCards={setCardState} glowCondition={turn === 'player2' ? 'glowOutline' : ''}/>
             </div>
             <div></div>
             <div></div>
@@ -92,8 +92,8 @@ const Game = () => {
             </div>
             <div></div>
             <div></div>
-            <div>
-              <CardGrid setPlayerCards={setCardState}/>
+            <div >
+              <CardGrid setPlayerCards={setCardState} glowCondition={turn === 'player1' ? 'glowOutline' : ''} />
             </div>
             <div></div>
           </div>

@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import './GameStylesheet.css';
 import Game from "./Game";
 
 function App() {
