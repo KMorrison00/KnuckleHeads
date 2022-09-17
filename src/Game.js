@@ -19,18 +19,16 @@ const Game = () => {
   const [p1Cards, setP1Cards] = useState([[],[],[]]);
   const [p2Cards, setP2Cards] = useState([[],[],[]]);
   const [choosingGridSpot, setChoosingGridSpot] = useState('');
-  
   const [card, setCardState] = useState(new CardData());
   const players = {'player1': p1Cards, 'player2': p2Cards}
   const inversePlayerMap = {'player1': ['player2', p2Cards],
-                            'player2': ['player1', p1Cards]}
-
+  'player2': ['player1', p1Cards]}
+  
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
     console.log(deckId)
     let {code, image} = await drawCard({deckId: deckId}).catch((e)=> {console.log(e)});
-    var newCard = new CardData({cardValue: code, cardImageUrl: image, classes:card.classes})
-    setCardState(newCard)
+    setCardState(new CardData({cardVal: code, cardImageUrl: image}))
   }
 
   function placeCardInGrid() {
@@ -38,18 +36,22 @@ const Game = () => {
       console.log('trying to place')
     }
   }
-
-
+  
+  
   // STARTUP CODE 
   const didMount = useFirstRender(null);
-
+  
   useEffect(() => {
-      const getDeck = async () => {
-        const deck_id = await createDeck(1);
-        setDeckId(deck_id)
+    const getDeck = async () => {
+      const deck_id = await createDeck(1);
+      setDeckId(deck_id)
+    }
+    
+    getDeck()
+    console.log(deckId)
+    if (!didMount) {
+      //MOVE getDeck() BACK IN HERE WHEN NOT DEBUGGING
       }
-      getDeck()
-      console.log(deckId)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [] // only on startup 
@@ -58,6 +60,8 @@ const Game = () => {
 
   // Main Game Loop
   useEffect(() => {
+    // needs to be here to render the card backing
+    setCardState(new CardData({cardVal:'pile'})) 
     if (didMount) {
       drawCardFromDeck()
       setChoosingGridSpot(true) 
@@ -66,12 +70,13 @@ const Game = () => {
     }
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps 
-    [turn]
+  [turn]
   )
   
-
+  console.log('RENDERED THE WHOLE DAMN GAME')
+  
   return (
-        <div>
+    <div>
           <div className="grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center">
             <div></div>
             <div>
