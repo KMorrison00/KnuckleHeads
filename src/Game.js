@@ -31,13 +31,6 @@ const Game = () => {
     let {code, image} = await drawCard({deckId: deckId}).catch((e)=> {console.log(e)});
     setCardState(new CardData({cardVal: code, cardImageUrl: image}))
   }
-
-  function placeCardInGrid() {
-    if (choosingGridSpot) {
-      console.log('trying to place')
-    }
-  }
-  
   
   // STARTUP CODE 
   const didMount = useFirstRender(null);
@@ -47,11 +40,11 @@ const Game = () => {
       const deck_id = await createDeck(1);
       setDeckId(deck_id)
     }
-    // needs to be here to render the card backing
     setCardState(new CardData()) 
     getDeck()
     console.log(deckId)
     if (!didMount) {
+      
       //MOVE getDeck() BACK IN HERE WHEN NOT DEBUGGING
       }
     },
@@ -64,7 +57,8 @@ const Game = () => {
   useEffect(() => {
     if (didMount) {
       console.log('ENTERED MAIN GAME LOOP')
-      drawCardFromDeck()
+      // needs to be here to render the card backing
+      setCardState(new CardData()) 
       setChoosingGridSpot(true) 
       // end of turn set to other turn
       setTurn(inversePlayerMap[turn][0])
@@ -91,7 +85,7 @@ const Game = () => {
             <div></div>
             <div className="grid grid-cols-2 gap-10">
               {/* add on click to move image? */}
-              <button onClick={() =>  {drawCardFromDeck(); placeCardInGrid();}}>
+              <button onClick={() =>  {drawCardFromDeck();}}>
                 <Card cardData={new CardData({cardImageUrl:CardBack})} />
               </button>
               <button className="outline-none outline-white">

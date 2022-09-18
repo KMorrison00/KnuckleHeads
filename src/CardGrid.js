@@ -48,8 +48,8 @@ export const CardGrid = ({ setPlayerCards, choosingGridSpot, opponentsTurn, pote
                             )
                         )}
                 </div> 
+              )
             )
-        )
         }
     </div>)
 }
