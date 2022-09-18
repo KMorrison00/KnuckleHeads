@@ -20,7 +20,11 @@ export const CardGrid = ({ setPlayerCards, choosingGridSpot, opponentsTurn, pote
             console.log("FIRST RENDER GRID");
         } else {
             // game is running so we just want to update the grid 
-
+            let row = editedCard[1][1];
+            let col = editedCard[1][3];
+            let newCardList = cardList.slice();
+            newCardList[row][col] = editedCard[0];
+            setCardList(newCardList)
         }
 
     }, [editedCard]);
@@ -37,12 +41,13 @@ export const CardGrid = ({ setPlayerCards, choosingGridSpot, opponentsTurn, pote
                 <div className={"grid grid-cols-3 gap-4 " + (opponentsTurn ? '' : 'glowOutline')} >
                     {column.map( // <--- Also notice here, we have wrapped it in curly braces, because it is an "expression" inside JSX.
                         (card, j) => (
-                            <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} className={"outline-none outline-white hover:outline-apple-green hover:animate-small-ping "}>
+                            <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} className={`outline-none outline-white hover:animate-enlarge`}>
                                 <Card cardData={card}
                                       choosingGridSpot={choosingGridSpot} 
                                       opponentsTurn={opponentsTurn}
                                       setEditedCard={setEditedCard}
                                       potentialCard={potentialCard}
+                                      gridPos={`row-${i}-col-${j}`}
                                     />
                             </div>
                             )
@@ -54,4 +59,3 @@ export const CardGrid = ({ setPlayerCards, choosingGridSpot, opponentsTurn, pote
     </div>)
 }
 
-// hover:outline-apple-green hover:animate-small-ping

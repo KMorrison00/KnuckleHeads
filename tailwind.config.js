@@ -20,11 +20,11 @@ module.exports = {
         'apple-green' : '#ACECB1'
       },
       animation: {
-        'small-ping': 'small-ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;'
+        'enlarge': 'enlarge 1s cubic-bezier(0, 0, 0.2, 1) ;'
       },
       keyframes: {
-        'small-ping': { 
-          '75%, 100%' : {transform: 'scale(1.1)', opacity: '0'}
+        'enlarge': { 
+          '75%, 100%' : {transform: 'scale(1.1)'}
         }
       }
     },

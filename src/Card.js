@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 
-export const Card = ({cardData, choosingGridSpot, opponentsTurn, setEditedCard, potentialCard}) => {
+export const Card = ({cardData, choosingGridSpot, gridPos,
+                      opponentsTurn, setEditedCard, potentialCard}) => {
     console.log(cardData.cardVal)
     const clickHoverCondition = choosingGridSpot && !opponentsTurn && cardData.cardVal === '';
     return (
       <div >
           <img src={cardData.cardImageUrl} alt={cardData.cardVal}
+          className={gridPos}
             onMouseOver={(e) => {
               if (clickHoverCondition) {
                 e.currentTarget.src = potentialCard.cardImageUrl;
@@ -18,9 +20,9 @@ export const Card = ({cardData, choosingGridSpot, opponentsTurn, setEditedCard, 
                 }
               }
             }
-            onClick={()=>{
+            onClick={(e)=>{
               if (clickHoverCondition) {
-                setEditedCard([potentialCard, ''])
+                setEditedCard([potentialCard, e.currentTarget.className.split('-')])
               }
               console.log("CLICK INSIDE CARD", cardData.cardVal)}}/>
       </div>
