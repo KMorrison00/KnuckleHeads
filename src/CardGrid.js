@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Card } from "./Card";
 import { CardData } from "./Game";
 
-export const CardGrid = ({ setPlayerCards, glowCondition }) => {
+export const CardGrid = ({ setPlayerCards, choosingGridSpot, opponentsTurn, potentialCard }) => {
     const [cardList, setCardList] = useState([[], [], []]);
+    const [editedCard, setEditedCard] = useState();
 
     useEffect(() => {
         if (cardList[0].length === 0) {
@@ -17,21 +18,32 @@ export const CardGrid = ({ setPlayerCards, glowCondition }) => {
             setCardList(initGrid);
             setPlayerCards(initGrid);
             console.log("FIRST RENDER GRID");
+        } else {
+            // game is running so we just want to update the grid 
+
         }
-    }, []);
+
+    }, [editedCard]);
+
+
 
   
     console.log()
     return (<div className={"grid grid-rows-1 gap-4 "}  >
         {
         cardList.map(
-            (column) => (
+            (column, i) => (
                 // <--- Notice this, it will wrap all JSX elements below in one single JSX element.
-                <div className={"grid grid-cols-3 gap-4 " + glowCondition} >
+                <div className={"grid grid-cols-3 gap-4 " + (opponentsTurn ? '' : 'glowOutline')} >
                     {column.map( // <--- Also notice here, we have wrapped it in curly braces, because it is an "expression" inside JSX.
-                        (card) => (
-                            <div style={{"z-index" : "2", backgroundColor:'#053C61'}} className={"outline-none outline-white hover:outline-apple-green hover:animate-small-ping "}>
-                                <Card cardData={card} ></Card>
+                        (card, j) => (
+                            <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} className={"outline-none outline-white hover:outline-apple-green hover:animate-small-ping "}>
+                                <Card cardData={card}
+                                      choosingGridSpot={choosingGridSpot} 
+                                      opponentsTurn={opponentsTurn}
+                                      setEditedCard={setEditedCard}
+                                      potentialCard={potentialCard}
+                                    />
                             </div>
                             )
                         )}
