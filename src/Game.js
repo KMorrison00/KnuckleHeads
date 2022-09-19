@@ -14,7 +14,7 @@ export class CardData {
 }
 
 const Game = () => {
-  const [turn, setTurn] = useState('player2');
+  const [turn, setTurn] = useState('player1');
   const [deckId, setDeckId] = useState(null);
   // ADD RESHUFFLING OF DECK AT SOME POINT
   const [p1Cards, setP1Cards] = useState([[],[],[]]);
@@ -57,11 +57,7 @@ const Game = () => {
   useEffect(() => {
     if (didMount) {
       console.log('ENTERED MAIN GAME LOOP')
-      // needs to be here to render the card backing
-      setCardState(new CardData()) 
-      setChoosingGridSpot(true) 
-      // end of turn set to other turn
-      setTurn(inversePlayerMap[turn][0])
+      // setTurn(inversePlayerMap[turn][0])
     }
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps 
@@ -77,15 +73,17 @@ const Game = () => {
             <div>
               <CardGrid setPlayerCards={setP2Cards} 
                         choosingGridSpot={choosingGridSpot}
+                        setChoosingGridSpot={setChoosingGridSpot}
                         opponentsTurn={turn === 'player1'}
                         potentialCard={card}
+                        setTurn={()=>{setTurn(inversePlayerMap[turn][0]);}}
                         />
             </div>
             <div></div>
             <div></div>
             <div className="grid grid-cols-2 gap-10">
               {/* add on click to move image? */}
-              <button onClick={() =>  {drawCardFromDeck();}}>
+              <button onClick={() =>  {drawCardFromDeck(); setChoosingGridSpot(true);}}>
                 <Card cardData={new CardData({cardImageUrl:CardBack})} />
               </button>
               <button className="outline-none outline-white">
@@ -97,8 +95,10 @@ const Game = () => {
             <div >
               <CardGrid setPlayerCards={setP1Cards} 
                         choosingGridSpot={choosingGridSpot}
+                        setChoosingGridSpot={setChoosingGridSpot}
                         opponentsTurn={turn === 'player2'}
                         potentialCard={card}
+                        setTurn={()=>{setTurn(inversePlayerMap[turn][0]);}}
                         />
             </div>
             <div></div>

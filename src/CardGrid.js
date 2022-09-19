@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Card } from "./Card";
 import { CardData } from "./Game";
 
-export const CardGrid = ({ setPlayerCards, choosingGridSpot, opponentsTurn, potentialCard }) => {
+export const CardGrid = ({ setPlayerCards, choosingGridSpot, setChoosingGridSpot,
+                           opponentsTurn, potentialCard, setTurn }) => {
     const [cardList, setCardList] = useState([[], [], []]);
     const [editedCard, setEditedCard] = useState();
 
@@ -20,11 +21,15 @@ export const CardGrid = ({ setPlayerCards, choosingGridSpot, opponentsTurn, pote
             console.log("FIRST RENDER GRID");
         } else {
             // game is running so we just want to update the grid 
-            let row = editedCard[1][1];
-            let col = editedCard[1][3];
-            let newCardList = cardList.slice();
-            newCardList[row][col] = editedCard[0];
-            setCardList(newCardList)
+            if (choosingGridSpot && !opponentsTurn) {
+                let row = editedCard[1][1];
+                let col = editedCard[1][3];
+                let newCardList = cardList.slice();
+                newCardList[row][col] = editedCard[0];
+                setCardList(newCardList);
+                setChoosingGridSpot(false);
+                setTurn();
+            }
         }
 
     }, [editedCard]);
