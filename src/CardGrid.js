@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "./Card";
-import { CardData } from "./Game";
+import {CardData, CARDVALUES} from './Constants';
 
 export const CardGrid = ({ setPlayerCards, choosingGridSpot, setChoosingGridSpot,
                            opponentsTurn, potentialCard, setTurn }) => {
@@ -27,6 +27,7 @@ export const CardGrid = ({ setPlayerCards, choosingGridSpot, setChoosingGridSpot
                 let newCardList = cardList.slice();
                 newCardList[row][col] = editedCard[0];
                 setCardList(newCardList);
+                setPlayerCards(newCardList)
                 setChoosingGridSpot(false);
                 setTurn();
             }

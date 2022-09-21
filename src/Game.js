@@ -2,16 +2,9 @@ import React, {useEffect, useState, useRef} from "react";
 import { CardGrid } from "./CardGrid";
 import { Card } from "./Card"
 import CardBack from './CardBack.png'
-import NullCard from './NullCard.png'
-import {createDeck, drawCard} from './Api'
+import {createDeck, drawCard} from './Api';
 import { useFirstRender } from "./Utils";
-
-export class CardData {
-  constructor({cardVal='', cardImageUrl=NullCard} = {}) {
-    this.cardImageUrl = cardImageUrl;
-    this.cardVal = cardVal;
-  }
-}
+import { CardData, getCardValueFromCode } from './Constants';
 
 const Game = () => {
   const [turn, setTurn] = useState('player1');
@@ -19,6 +12,8 @@ const Game = () => {
   // ADD RESHUFFLING OF DECK AT SOME POINT
   const [p1Cards, setP1Cards] = useState([[],[],[]]);
   const [p2Cards, setP2Cards] = useState([[],[],[]]);
+  const [p1Scores, setP1Scores] = useState([0,0,0,0]);
+  const [p2Scores, setP2Scores] = useState([0,0,0,0]);
   const [choosingGridSpot, setChoosingGridSpot] = useState(false);
   const [card, setCardState] = useState(new CardData());
   const players = {'player1': p1Cards, 'player2': p2Cards}
@@ -31,10 +26,93 @@ const Game = () => {
     let {code, image} = await drawCard({deckId: deckId}).catch((e)=> {console.log(e)});
     setCardState(new CardData({cardVal: code, cardImageUrl: image}))
   }
+
+  function UpdateScores() {
+    
+  }
+
+  function calculateScores(cardList) {
+    let scores = [0,0,0,0];
+    let colArr = [[],[],[]]
+    for (let col=0; col < 3; col++){
+
+      let multiplier = 1;
+      let flush = false
+      let straight = false
+
+      // convert entries into column format
+      for(let row=0; row < 3; row++) {
+        colArr[col].push(getCardValueFromCode(cardList[row][col].cardVal))
+      }
+      // if all entries in col make a flush then x 2
+      if (colArr[col][0].suit === colArr[col][1].suit &&
+           colArr[col][1].suit === colArr[col][2].suit) {
+            multiplier *= 2; 
+            flush = true
+      }
+      // if all entries in col make a flush then x 2
+      if (checkForStraight(colArr[col])) {
+        multiplier *= 2;
+        straight = true;  
+      }
+      // straight flush give 6x multiplier
+      if (flush && straight) {
+        multiplier = 6
+      }
+      // now calculate pure numerical value
+      // first check face value doubling because its different
+      let tmpNumStorage = [];
+      for (let i = 0; i< 3; i++){
+        if (!isFaceCard(colArr[col][0].strVal)) {
+          
+        }
+      }
+      if (colArr[col][0].strVal === 'J' || colArr[col][0].strVal === 'Q' || colArr[col][0].strVal === 'K') {
+
+      }
+
+
+
+      console.log(turn, colArr[col])
+    }
+  }
+
+  function isFaceCard(str) {
+    if (str === 'J' || str === 'Q' || str === 'K') {
+      return true;
+    }
+    return false;
+  }
   
+  function checkForStraight(col) {
+    let strVals = []
+    let numVals = []
+    for (let i =0; i < 3; i++) {
+      strVals.push(col[i].strVal)
+      numVals.push(col[i].val)
+    }
+    // this covers all the face card straight possibilities
+    if (strVals.includes('J')) {
+      if (strVals.includes('Q')) {
+        if (strVals.includes('K') || numVals.includes(10)) {
+          return true
+        }
+      } else if (numVals.includes(10)) {
+        if (numVals.includes(9)) {
+          return true
+        }
+      }
+    }
+    // now calculate the pure num possibilities
+    if ((numVals.includes(numVals[0] + 1) && numVals.includes(numVals[0] + 2)) || 
+        (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] - 2))) {
+          return true
+      }
+    return false
+  }
+
+
   // STARTUP CODE 
-  const didMount = useFirstRender(null);
-  
   useEffect(() => {
     const getDeck = async () => {
       const deck_id = await createDeck(1);
@@ -43,10 +121,6 @@ const Game = () => {
     setCardState(new CardData()) 
     getDeck()
     console.log(deckId)
-    if (!didMount) {
-      
-      //MOVE getDeck() BACK IN HERE WHEN NOT DEBUGGING
-      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [] // only on startup 
@@ -55,13 +129,14 @@ const Game = () => {
 
   // Main Game Loop
   useEffect(() => {
-    if (didMount) {
       console.log('ENTERED MAIN GAME LOOP')
-      // setTurn(inversePlayerMap[turn][0])
-    }
+      // make sure card lists have been populated
+      if (p2Cards[0].length > 0){
+        calculateScores(inversePlayerMap[turn][1])
+      }
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps 
-  [turn]
+    [turn]
   )
   
   console.log('RENDERED THE WHOLE DAMN GAME')
@@ -78,6 +153,14 @@ const Game = () => {
                         potentialCard={card}
                         setTurn={()=>{setTurn(inversePlayerMap[turn][0]);}}
                         />
+              <div className="grid grid-cols-3 place-items-center gap-4 mt-4">
+                <div>{p1Scores[0]}</div>
+                <div>{p1Scores[1]}</div>
+                <div>{p1Scores[2]}</div>
+              </div>
+              <div className="grid place-items-center">
+                Total: {p1Scores[3]}
+              </div>
             </div>
             <div></div>
             <div></div>
@@ -93,6 +176,14 @@ const Game = () => {
             <div></div>
             <div></div>
             <div >
+              <div className="grid place-items-center">
+                Total: {p1Scores[3]}
+              </div>
+              <div className="grid grid-cols-3 place-items-center gap-4 mb-4">
+                <div>{p1Scores[0]}</div>
+                <div>{p1Scores[1]}</div>
+                <div>{p1Scores[2]}</div>
+              </div>
               <CardGrid setPlayerCards={setP1Cards} 
                         choosingGridSpot={choosingGridSpot}
                         setChoosingGridSpot={setChoosingGridSpot}
