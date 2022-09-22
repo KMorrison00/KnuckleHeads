@@ -17,8 +17,8 @@ const Game = () => {
   const [choosingGridSpot, setChoosingGridSpot] = useState(false);
   const [card, setCardState] = useState(new CardData());
   const players = {'player1': p1Cards, 'player2': p2Cards}
-  const inversePlayerMap = {'player1': ['player2', p2Cards],
-  'player2': ['player1', p1Cards]}
+  const inversePlayerMap = {'player1': ['player2', p2Cards, setP2Scores],
+  'player2': ['player1', p1Cards, setP1Scores]}
   
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
@@ -27,54 +27,85 @@ const Game = () => {
     setCardState(new CardData({cardVal: code, cardImageUrl: image}))
   }
 
-  function UpdateScores() {
-    
-  }
-
-  function calculateScores(cardList) {
+  function calculateAndUpdateScores(cardList) {
     let scores = [0,0,0,0];
-    let colArr = [[],[],[]]
     for (let col=0; col < 3; col++){
-
+      let colArr = []
+      let valuesArr = []
+      let strValuesArr = []
       let multiplier = 1;
       let flush = false
       let straight = false
 
       // convert entries into column format
       for(let row=0; row < 3; row++) {
-        colArr[col].push(getCardValueFromCode(cardList[row][col].cardVal))
+        // account for columns that arent full
+        let valDict = getCardValueFromCode(cardList[row][col].cardVal)
+        if (isNaN(valDict.val)) {
+          valDict.val = 0
+        }
+        colArr.push(valDict)
+        valuesArr.push(valDict.val)
+        strValuesArr.push(valDict.strVal)
       }
-      // if all entries in col make a flush then x 2
-      if (colArr[col][0].suit === colArr[col][1].suit &&
-           colArr[col][1].suit === colArr[col][2].suit) {
+      // check for 2's
+      for (let i = 0; i < 3; i++) {
+        multiplier *= valuesArr[i] === 2 ? 2 : 1
+      }
+      // if any entries aren't populated skip checking flush/straights
+      if (!valuesArr.includes(NaN)) {
+        // if all entries in col make a flush then x 2
+        if (colArr[0].suit === colArr[1].suit &&
+          colArr[1].suit === colArr[2].suit) {
             multiplier *= 2; 
             flush = true
-      }
-      // if all entries in col make a flush then x 2
-      if (checkForStraight(colArr[col])) {
-        multiplier *= 2;
-        straight = true;  
-      }
-      // straight flush give 6x multiplier
-      if (flush && straight) {
-        multiplier = 6
-      }
-      // now calculate pure numerical value
-      // first check face value doubling because its different
-      let tmpNumStorage = [];
-      for (let i = 0; i< 3; i++){
-        if (!isFaceCard(colArr[col][0].strVal)) {
+          }
+          // if all entries in col make a flush then x 2
+          if (isStraight(colArr)) {
+            multiplier *= 2;
+            straight = true;  
+          }
+          // straight flush gives 6x multiplier
+          multiplier = flush && straight ? 6 : multiplier
           
+          // calculate score and exit iteration
+          // you cant have doubles or triples if you have a straight or flush
+          if (flush || straight) {
+            scores[col] = (valuesArr[0] + valuesArr[1] + valuesArr[2]) * multiplier
+            continue
+          }
+      }
+
+      // now calculate pure numerical value      
+      console.log('CHECKING FOR DUBS/TRIPS', strValuesArr)
+      if (strValuesArr[0] === strValuesArr[1]) {
+        // triples detected
+        if (strValuesArr[1] === strValuesArr[2]) {
+          // face card triples are worth more (4x)
+          // otherwise just x3, but make sure to account for 2's
+          scores[col] = isFaceCard(strValuesArr[0]) ? 4 * valuesArr[0] : 3 * valuesArr[0] * multiplier
+          continue
         }
+        // check for face card doubles
+        let faceMultiplier = isFaceCard(strValuesArr[0]) ? 3 : 2
+        scores[col] = ((2 * valuesArr[0] * faceMultiplier) + valuesArr[2]) * multiplier
+      } 
+      else if (strValuesArr[0] === strValuesArr[2]) {
+        let faceMultiplier = isFaceCard(strValuesArr[2]) ? 3 : 2
+        scores[col] = ((2 * valuesArr[2] * faceMultiplier) + valuesArr[1]) * multiplier
+      } 
+      else if (strValuesArr[1] === strValuesArr[2]) {
+        let faceMultiplier = isFaceCard(strValuesArr[1]) ? 3 : 2
+        scores[col] = ((2 * valuesArr[1] * faceMultiplier) + valuesArr[0]) * multiplier
+      } 
+      else {
+        scores[col] = (valuesArr[0] + valuesArr[1] + valuesArr[2]) * multiplier
       }
-      if (colArr[col][0].strVal === 'J' || colArr[col][0].strVal === 'Q' || colArr[col][0].strVal === 'K') {
-
-      }
-
-
-
-      console.log(turn, colArr[col])
     }
+    scores[3] = scores[0] + scores[1] + scores[2]
+    // update the scores (map contains the set function)
+    console.log(scores)
+    inversePlayerMap[turn][2](scores)
   }
 
   function isFaceCard(str) {
@@ -84,7 +115,7 @@ const Game = () => {
     return false;
   }
   
-  function checkForStraight(col) {
+  function isStraight(col) {
     let strVals = []
     let numVals = []
     for (let i =0; i < 3; i++) {
@@ -132,7 +163,7 @@ const Game = () => {
       console.log('ENTERED MAIN GAME LOOP')
       // make sure card lists have been populated
       if (p2Cards[0].length > 0){
-        calculateScores(inversePlayerMap[turn][1])
+        calculateAndUpdateScores(inversePlayerMap[turn][1])
       }
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps 
@@ -143,9 +174,9 @@ const Game = () => {
   
   return (
     <div>
-          <div className="gameBoard grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center">
+          <div className="gameBoard grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center text-apple-green">
             <div></div>
-            <div>
+            <div className="text-inherit">
               <CardGrid setPlayerCards={setP2Cards} 
                         choosingGridSpot={choosingGridSpot}
                         setChoosingGridSpot={setChoosingGridSpot}
@@ -153,13 +184,13 @@ const Game = () => {
                         potentialCard={card}
                         setTurn={()=>{setTurn(inversePlayerMap[turn][0]);}}
                         />
-              <div className="grid grid-cols-3 place-items-center gap-4 mt-4">
-                <div>{p1Scores[0]}</div>
-                <div>{p1Scores[1]}</div>
-                <div>{p1Scores[2]}</div>
+              <div className="grid grid-cols-3 place-items-center gap-4 mt-4 text-inherit">
+                <div className="text-inherit">{p2Scores[0]}</div>
+                <div className="text-inherit">{p2Scores[1]}</div>
+                <div className="text-inherit">{p2Scores[2]}</div>
               </div>
               <div className="grid place-items-center">
-                Total: {p1Scores[3]}
+                Total: {p2Scores[3]}
               </div>
             </div>
             <div></div>
@@ -175,14 +206,14 @@ const Game = () => {
             </div>
             <div></div>
             <div></div>
-            <div >
-              <div className="grid place-items-center">
+            <div className="text-apple-green">
+              <div className="grid place-items-center text-inherit">
                 Total: {p1Scores[3]}
               </div>
-              <div className="grid grid-cols-3 place-items-center gap-4 mb-4">
-                <div>{p1Scores[0]}</div>
-                <div>{p1Scores[1]}</div>
-                <div>{p1Scores[2]}</div>
+              <div className="grid grid-cols-3 place-items-center gap-4 mb-4 text-inherit">
+                <div className="text-inherit">{p1Scores[0]}</div>
+                <div className="text-inherit">{p1Scores[1]}</div>
+                <div className="text-inherit">{p1Scores[2]}</div>
               </div>
               <CardGrid setPlayerCards={setP1Cards} 
                         choosingGridSpot={choosingGridSpot}

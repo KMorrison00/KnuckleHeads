@@ -16,9 +16,11 @@ export const CARDVALUES = [
 export function getCardValueFromCode(code) {
     let val = code.slice(0, 1);
     let suit = code.slice(-1);
-    if (val === 'J' || val === 'Q' || val === 'K' || val === '0') {
+    if (val === 'J' || val === 'Q' || val === 'K' || val === '0' || val === 'A') {
         if (val === '0') {
             return {'val': 10, 'suit':suit, 'strVal' : val}
+        } else if (val === 'A') {
+            return {'val': 1, 'suit':suit, 'strVal' : val}
         }
         return {'val':5, 'suit':suit, 'strVal' : val}
     }
