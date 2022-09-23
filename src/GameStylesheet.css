@@ -5,13 +5,13 @@
 .glowOutline {
     background: #053C61;
     position: relative;
-    border-radius: 8px;
     box-shadow: 0 0 0 1px rgba(0,0,0,.01);
   }
 .glowOutline::after {
       position: absolute;
       content: "";
       top: 0;
+      left: 0;
       z-index: 0;
       height: 100%;
       width: 100%;

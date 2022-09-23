@@ -3,7 +3,6 @@ import { CardGrid } from "./CardGrid";
 import { Card } from "./Card"
 import CardBack from './CardBack.png'
 import {createDeck, drawCard} from './Api';
-import { useFirstRender } from "./Utils";
 import { CardData, getCardValueFromCode } from './Constants';
 
 const Game = () => {
@@ -16,7 +15,7 @@ const Game = () => {
   const [p2Scores, setP2Scores] = useState([0,0,0,0]);
   const [choosingGridSpot, setChoosingGridSpot] = useState(false);
   const [card, setCardState] = useState(new CardData());
-  const players = {'player1': p1Cards, 'player2': p2Cards}
+  const playerMap = {'player1': [p1Cards, setP1Scores], 'player2': [p2Cards, setP2Scores]}
   const inversePlayerMap = {'player1': ['player2', p2Cards, setP2Scores],
   'player2': ['player1', p1Cards, setP1Scores]}
   
@@ -24,10 +23,11 @@ const Game = () => {
   async function drawCardFromDeck() {
     console.log(deckId)
     let {code, image} = await drawCard({deckId: deckId}).catch((e)=> {console.log(e)});
-    setCardState(new CardData({cardVal: code, cardImageUrl: image}))
+    setCardState(new CardData({cardVal: code, cardImageUrl: image}));
+    setChoosingGridSpot(true);
   }
 
-  function calculateAndUpdateScores(cardList) {
+  function calculateAndUpdateScores(cardList, setScore) {
     let scores = [0,0,0,0];
     for (let col=0; col < 3; col++){
       let colArr = []
@@ -52,6 +52,7 @@ const Game = () => {
       for (let i = 0; i < 3; i++) {
         multiplier *= valuesArr[i] === 2 ? 2 : 1
       }
+      console.log('MULTIPLIER', multiplier)
       // if any entries aren't populated skip checking flush/straights
       if (!valuesArr.includes(NaN)) {
         // if all entries in col make a flush then x 2
@@ -87,15 +88,16 @@ const Game = () => {
           continue
         }
         // check for face card doubles
-        let faceMultiplier = isFaceCard(strValuesArr[0]) ? 3 : 2
-        scores[col] = ((2 * valuesArr[0] * faceMultiplier) + valuesArr[2]) * multiplier
+        let faceMultiplier = isFaceCard(strValuesArr[0]) ? 3 : 1
+        scores[col] = (((2 * valuesArr[0] * faceMultiplier) + valuesArr[2]) * multiplier)
+        console.log('FIRST TWO WERE DOUBLES', (((2 * valuesArr[0] * faceMultiplier) + valuesArr[2]) * multiplier))
       } 
       else if (strValuesArr[0] === strValuesArr[2]) {
-        let faceMultiplier = isFaceCard(strValuesArr[2]) ? 3 : 2
+        let faceMultiplier = isFaceCard(strValuesArr[2]) ? 3 : 1
         scores[col] = ((2 * valuesArr[2] * faceMultiplier) + valuesArr[1]) * multiplier
       } 
       else if (strValuesArr[1] === strValuesArr[2]) {
-        let faceMultiplier = isFaceCard(strValuesArr[1]) ? 3 : 2
+        let faceMultiplier = isFaceCard(strValuesArr[1]) ? 3 : 1
         scores[col] = ((2 * valuesArr[1] * faceMultiplier) + valuesArr[0]) * multiplier
       } 
       else {
@@ -104,8 +106,8 @@ const Game = () => {
     }
     scores[3] = scores[0] + scores[1] + scores[2]
     // update the scores (map contains the set function)
+    setScore(scores)
     console.log(scores)
-    inversePlayerMap[turn][2](scores)
   }
 
   function isFaceCard(str) {
@@ -142,6 +144,21 @@ const Game = () => {
     return false
   }
 
+  function isGameOver() {
+    let cards = playerMap[turn][0];
+    let cardCount = 0;
+    cards.forEach((col) => {
+      col.forEach((card) => {
+        if (card.val !== '') {
+          cardCount += 1;
+        }
+      })
+    })
+    if (cardCount === 9) {
+      return true
+    }
+    return false
+  }
 
   // STARTUP CODE 
   useEffect(() => {
@@ -161,9 +178,14 @@ const Game = () => {
   // Main Game Loop
   useEffect(() => {
       console.log('ENTERED MAIN GAME LOOP')
-      // make sure card lists have been populated
+      // make sure card lists have been instantiated
       if (p2Cards[0].length > 0){
-        calculateAndUpdateScores(inversePlayerMap[turn][1])
+        calculateAndUpdateScores(inversePlayerMap[turn][1], inversePlayerMap[turn][2])
+        // update both grids so that things like card changes get registered
+        calculateAndUpdateScores(playerMap[turn][0], playerMap[turn][1])
+        if (isGameOver()) {
+          console.log('GAME OVER')
+        }
       }
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps 
@@ -197,11 +219,11 @@ const Game = () => {
             <div></div>
             <div className="grid grid-cols-2 gap-10">
               {/* add on click to move image? */}
-              <button onClick={() =>  {drawCardFromDeck(); setChoosingGridSpot(true);}}>
+              <button onClick={() =>  {drawCardFromDeck();}}>
                 <Card cardData={new CardData({cardImageUrl:CardBack})} />
               </button>
-              <button className="outline-none outline-white">
-                <Card cardData={card} />
+              <button className={"transition outline-none outline-white ease-in-out" + (choosingGridSpot? '':' brightness-50')}>
+                  <Card cardData={card} />
               </button>
             </div>
             <div></div>
