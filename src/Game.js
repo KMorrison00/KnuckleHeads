@@ -1,7 +1,7 @@
 import React, {useEffect, useState, useRef} from "react";
 import { CardGrid } from "./CardGrid";
 import { Card } from "./Card"
-import CardBack from './CardBack.png'
+import CardBack from './images/CardBack.png'
 import {createDeck, drawCard} from './Api';
 import { CardData, getCardValueFromCode } from './Constants';
 
