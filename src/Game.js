@@ -5,6 +5,9 @@ import CardBack from './images/CardBack.png'
 import {createDeck, drawCard} from './Api';
 import { ChooseCardModal } from "./ChooseCardModal";
 import { CardData, getCardValueFromCode } from './Constants';
+import io from 'socket.io-client';
+
+// const socket = io('http://localhost:4000');
 
 const Game = () => {
   const [turn, setTurn] = useState('player1');
@@ -14,6 +17,7 @@ const Game = () => {
   const [p2Cards, setP2Cards] = useState([[],[],[]]);
   const [p1Scores, setP1Scores] = useState([0,0,0,0]);
   const [p2Scores, setP2Scores] = useState([0,0,0,0]);
+  const [hasOpponent, setHasOpponent] = useState(false);
   const [choosingGridSpot, setChoosingGridSpot] = useState(false);
   const [card, setCardState] = useState(new CardData());
   const playerMap = {'player1': [p1Cards, setP1Scores], 'player2': [p2Cards, setP2Scores]}
@@ -196,7 +200,7 @@ const Game = () => {
   console.log('RENDERED THE WHOLE DAMN GAME')
   
   return (
-    <div> 
+    <div className="Game"> 
           <div className="gameBoard grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center text-apple-green">
             <div></div>
             <div className="text-inherit">
