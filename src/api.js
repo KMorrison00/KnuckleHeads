@@ -1,5 +1,5 @@
 import axios from "axios";
-import CardBack from './CardBack.png'
+import CardBack from './images/CardBack.png'
 
 const api = axios.create({
   baseURL: "https://www.deckofcardsapi.com/api/deck/",

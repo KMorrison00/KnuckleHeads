@@ -1,11 +1,11 @@
-import NullCard from './NullCard.png'
+import NullCard from './images/NullCard.png'
 
 export class CardData {
     constructor({cardVal='', cardImageUrl=NullCard} = {}) {
       this.cardImageUrl = cardImageUrl;
       this.cardVal = cardVal;
     }
-  }
+}
 export const CARDVALUES = [
     'AS', '2S', '3S', '4S', '5S', '6S', '7S', '8S', '9S', '0S', 'JS', 'QS', 'KS',
     'AD', '2D', '3D', '4D', '5D', '6D', '7D', '8D', '9D', '0D', 'JD', 'QD', 'KD',

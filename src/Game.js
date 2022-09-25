@@ -3,6 +3,7 @@ import { CardGrid } from "./CardGrid";
 import { Card } from "./Card"
 import CardBack from './images/CardBack.png'
 import {createDeck, drawCard} from './Api';
+import { ChooseCardModal } from "./ChooseCardModal";
 import { CardData, getCardValueFromCode } from './Constants';
 
 const Game = () => {
@@ -195,7 +196,7 @@ const Game = () => {
   console.log('RENDERED THE WHOLE DAMN GAME')
   
   return (
-    <div>
+    <div> 
           <div className="gameBoard grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center text-apple-green">
             <div></div>
             <div className="text-inherit">
@@ -247,7 +248,7 @@ const Game = () => {
             </div>
             <div></div>
           </div>
-        </div>
+      </div>
     )
 }
 
