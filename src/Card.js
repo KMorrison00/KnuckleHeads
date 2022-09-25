@@ -21,6 +21,7 @@ export const Card = ({cardData, choosingGridSpot, gridPos,
             }
             onClick={(e)=>{
               if (clickHoverCondition) {
+                // the class name stores the row and column info of the spot
                 setEditedCard([potentialCard, e.currentTarget.className.split('-')])
               }
             }}

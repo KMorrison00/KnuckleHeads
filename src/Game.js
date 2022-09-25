@@ -89,16 +89,16 @@ const Game = () => {
           continue
         }
         // check for face card doubles
-        let faceMultiplier = isFaceCard(strValuesArr[0]) ? 3 : 1
+        let faceMultiplier = isFaceCard(strValuesArr[0]) ? 3 : 2
         scores[col] = (((2 * valuesArr[0] * faceMultiplier) + valuesArr[2]) * multiplier)
         console.log('FIRST TWO WERE DOUBLES', (((2 * valuesArr[0] * faceMultiplier) + valuesArr[2]) * multiplier))
       } 
       else if (strValuesArr[0] === strValuesArr[2]) {
-        let faceMultiplier = isFaceCard(strValuesArr[2]) ? 3 : 1
+        let faceMultiplier = isFaceCard(strValuesArr[2]) ? 3 : 2
         scores[col] = ((2 * valuesArr[2] * faceMultiplier) + valuesArr[1]) * multiplier
       } 
       else if (strValuesArr[1] === strValuesArr[2]) {
-        let faceMultiplier = isFaceCard(strValuesArr[1]) ? 3 : 1
+        let faceMultiplier = isFaceCard(strValuesArr[1]) ? 3 : 2
         scores[col] = ((2 * valuesArr[1] * faceMultiplier) + valuesArr[0]) * multiplier
       } 
       else {
@@ -146,11 +146,11 @@ const Game = () => {
   }
 
   function isGameOver() {
-    let cards = playerMap[turn][0];
+    let cards = inversePlayerMap[turn][1];
     let cardCount = 0;
     cards.forEach((col) => {
       col.forEach((card) => {
-        if (card.val !== '') {
+        if (card.cardVal !== '') {
           cardCount += 1;
         }
       })
@@ -204,6 +204,8 @@ const Game = () => {
                         choosingGridSpot={choosingGridSpot}
                         setChoosingGridSpot={setChoosingGridSpot}
                         opponentsTurn={turn === 'player1'}
+                        opponentCardList={p1Cards}
+                        setOpponentsCards={setP1Cards}
                         potentialCard={card}
                         setTurn={()=>{setTurn(inversePlayerMap[turn][0]);}}
                         />
@@ -238,10 +240,12 @@ const Game = () => {
                 <div className="text-inherit">{p1Scores[1]}</div>
                 <div className="text-inherit">{p1Scores[2]}</div>
               </div>
-              <CardGrid setPlayerCards={setP1Cards} 
+              <CardGrid setPlayerCards={setP1Cards}
                         choosingGridSpot={choosingGridSpot}
                         setChoosingGridSpot={setChoosingGridSpot}
                         opponentsTurn={turn === 'player2'}
+                        opponentCardList={p2Cards}
+                        setOpponentsCards={setP2Cards} 
                         potentialCard={card}
                         setTurn={()=>{setTurn(inversePlayerMap[turn][0]);}}
                         />

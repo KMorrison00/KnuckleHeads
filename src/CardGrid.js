@@ -1,11 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "./Card";
-import {CardData, CARDVALUES} from './Constants';
+import {CardData, getCardValueFromCode} from './Constants';
+
 
 export const CardGrid = ({ setPlayerCards, choosingGridSpot, setChoosingGridSpot,
-                           opponentsTurn, potentialCard, setTurn }) => {
+                           opponentsTurn, potentialCard, setTurn, setOpponentsCards, 
+                           opponentCardList }) => {
     const [cardList, setCardList] = useState([[], [], []]);
     const [editedCard, setEditedCard] = useState();
+
+    function checkAndRemoveOpposingCards(colNum, playerCardStrVal) {
+        let newCardList = opponentCardList.slice()
+        let changeCounter = 0;
+        for (let i =0; i< 3; i++) {
+            if (opponentCardList[i][colNum].cardVal !== '') {
+                let oppCard = getCardValueFromCode(opponentCardList[i][colNum].cardVal)
+                if (oppCard.strVal === playerCardStrVal) {
+                    newCardList[i][colNum] = new CardData();
+                    changeCounter++;
+                }
+            }
+        }
+        if (changeCounter !== 0) {
+            setOpponentsCards(newCardList);
+        }
+    }
 
     useEffect(() => {
         if (cardList[0].length === 0) {
@@ -26,6 +45,9 @@ export const CardGrid = ({ setPlayerCards, choosingGridSpot, setChoosingGridSpot
                 let col = editedCard[1][3];
                 let newCardList = cardList.slice();
                 newCardList[row][col] = editedCard[0];
+                console.log(editedCard[0])
+                // check and remove opposing cards
+                checkAndRemoveOpposingCards(col, getCardValueFromCode(editedCard[0].cardVal).strVal)
                 setCardList(newCardList);
                 setPlayerCards(newCardList)
                 setChoosingGridSpot(false);
