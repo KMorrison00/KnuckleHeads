@@ -6,8 +6,9 @@ import {createDeck, drawCard} from './Api';
 import { ChooseCardModal } from "./ChooseCardModal";
 import { CardData, getCardValueFromCode } from './Constants';
 import io from 'socket.io-client';
+import { useLocation } from 'react-router-dom';
 
-// const socket = io('http://localhost:4000');
+const socket = io('http://localhost:4000');
 
 const Game = () => {
   const [turn, setTurn] = useState('player1');
@@ -22,7 +23,12 @@ const Game = () => {
   const [card, setCardState] = useState(new CardData());
   const playerMap = {'player1': [p1Cards, setP1Scores], 'player2': [p2Cards, setP2Scores]}
   const inversePlayerMap = {'player1': ['player2', p2Cards, setP2Scores],
-  'player2': ['player1', p1Cards, setP1Scores]}
+                            'player2': ['player1', p1Cards, setP1Scores]}
+  const [share, setShare] = useState(false);
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const paramsRoom = params.get('room');
+  const [room, setRoom] = useState(paramsRoom);
   
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
@@ -31,6 +37,23 @@ const Game = () => {
     setCardState(new CardData({cardVal: code, cardImageUrl: image}));
     setChoosingGridSpot(true);
   }
+
+  const random = () => {
+    return Array.from(Array(8), () => Math.floor(Math.random() * 36).toString(36)).join('');
+  };
+
+  const restart = () => {
+    setP1Cards([[],[],[]])
+    setP2Cards([[],[],[]])
+    setChoosingGridSpot(false)
+    setTurn('player1');
+  };
+
+  const changeTurn = () => {
+    console.log('HIIIIII IM CHANGEING TURN', room)
+    socket.emit('reqTurn', JSON.stringify({ 'p1Cards': p1Cards, 'p2Cards': p2Cards, 'room':room}));
+  };
+
 
   function calculateAndUpdateScores(cardList, setScore) {
     let scores = [0,0,0,0];
@@ -167,18 +190,30 @@ const Game = () => {
 
   // STARTUP CODE 
   useEffect(() => {
-    const getDeck = async () => {
-      const deck_id = await createDeck(1);
-      setDeckId(deck_id)
-    }
-    setCardState(new CardData()) 
-    getDeck()
-    console.log(deckId)
-    },
+    
+    socket.on('playerTurn', (json) => {
+      // flip because other player has flipped representation
+      setP1Cards(JSON.parse(json).p2Cards)
+      setP2Cards(JSON.parse(json).p1Cards)
+    });
+
+    socket.on('restart', () => {
+      restart();
+    });
+
+    socket.on('opponent_joined', () => {
+      setHasOpponent(true);
+      setShare(false);
+    });
+    
+    socket.on('deckID', (json) => {
+      setDeckId(JSON.parse(json).deckId)
+    })
+  
+  },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [] // only on startup 
   )
-  
 
   // Main Game Loop
   useEffect(() => {
@@ -196,11 +231,50 @@ const Game = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps 
     [turn]
   )
+
+  useEffect(() => {
+    if (paramsRoom) {
+      // means you are player 2
+      socket.emit('join', paramsRoom);
+      setRoom(paramsRoom);
+      setTurn('player2');
+      console.log('JOINED THE ROOM', paramsRoom)
+    } else {
+      const getDeck = async () => {
+        const deck_id = await createDeck(1);
+        setDeckId(deck_id)
+      }
+      // means you are player 1
+      const newRoomName = random();
+      socket.emit('create', newRoomName);
+      setRoom(newRoomName);
+      setTurn('player1');
+      setCardState(new CardData()) 
+      getDeck()
+      socket.emit('setDeck', JSON.stringify(deckId, room))
+      console.log(deckId)
+    }
+}, [paramsRoom]);
   
-  console.log('RENDERED THE WHOLE DAMN GAME')
+console.log('RENDERED THE WHOLE DAMN GAME')
   
   return (
-    <div className="Game"> 
+    <div className="Game">
+      <button className="btn" onClick={() => setShare(!share)}>
+        Share
+      </button>
+        {share ? (
+          <>
+            <br />
+            <br />
+            Share link: <input type="text" value={`${window.location.href}?room=${room}`} readOnly />
+          </>
+        ) : null}
+        <br />
+        <br />
+        <br />
+        {hasOpponent ? '' : 'Waiting for opponent...'}
+        <p></p> 
           <div className="gameBoard grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center text-apple-green">
             <div></div>
             <div className="text-inherit">
@@ -211,7 +285,10 @@ const Game = () => {
                         opponentCardList={p1Cards}
                         setOpponentsCards={setP1Cards}
                         potentialCard={card}
-                        setTurn={()=>{setTurn(inversePlayerMap[turn][0]);}}
+                        setTurn={()=>{
+                          setTurn(inversePlayerMap[turn][0]);
+                          changeTurn();
+                        }}
                         />
               <div className="grid grid-cols-3 place-items-center gap-4 mt-4 text-inherit">
                 <div className="text-inherit">{p2Scores[0]}</div>
@@ -251,7 +328,10 @@ const Game = () => {
                         opponentCardList={p2Cards}
                         setOpponentsCards={setP2Cards} 
                         potentialCard={card}
-                        setTurn={()=>{setTurn(inversePlayerMap[turn][0]);}}
+                        setTurn={()=>{
+                          setTurn(inversePlayerMap[turn][0]);
+                          changeTurn();
+                        }}
                         />
             </div>
             <div></div>
