@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from "react";
+import React, {useEffect, useState, useCallback} from "react";
 import { CardGrid } from "./CardGrid";
 import { Card } from "./Card"
 import CardBack from './images/CardBack.png'
@@ -7,8 +7,6 @@ import { ChooseCardModal } from "./ChooseCardModal";
 import { CardData, getCardValueFromCode } from './Constants';
 import io from 'socket.io-client';
 import { useLocation } from 'react-router-dom';
-
-const socket = io('http://localhost:4000');
 
 const Game = () => {
   const [turn, setTurn] = useState('player1');
@@ -24,11 +22,13 @@ const Game = () => {
   const playerMap = {'player1': [p1Cards, setP1Scores], 'player2': [p2Cards, setP2Scores]}
   const inversePlayerMap = {'player1': ['player2', p2Cards, setP2Scores],
                             'player2': ['player1', p1Cards, setP1Scores]}
+  const [sentDeck, setSentDeck] = useState(false)
   const [share, setShare] = useState(false);
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const paramsRoom = params.get('room');
-  const [room, setRoom] = useState(paramsRoom);
+  const [room, setRoom] = useState();
+  const socket = io('http://localhost:4000');
   
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
@@ -188,6 +188,7 @@ const Game = () => {
     return false
   }
 
+
   // STARTUP CODE 
   useEffect(() => {
     
@@ -202,12 +203,14 @@ const Game = () => {
     });
 
     socket.on('opponent_joined', () => {
+      console.log('OPPONENT JOINED')
       setHasOpponent(true);
       setShare(false);
     });
     
-    socket.on('deckID', (json) => {
-      setDeckId(JSON.parse(json).deckId)
+    socket.on('deckID', (deckID) => {
+      console.log('GOT SENT A DECK ID', JSON.parse(deckID).deckId)
+      setDeckId(JSON.parse(deckID).deckId)
     })
   
   },
@@ -232,34 +235,46 @@ const Game = () => {
     [turn]
   )
 
+  
+  useEffect(() => {
+    if (deckId && !sentDeck) {
+      console.log('SENDING DECKID', deckId)
+      socket.emit('setDeck', JSON.stringify({'deckId': deckId, 'room': room}));
+      setSentDeck(true)
+    }
+  }, [deckId, sentDeck])
+
+
   useEffect(() => {
     if (paramsRoom) {
-      // means you are player 2
-      socket.emit('join', paramsRoom);
-      setRoom(paramsRoom);
-      setTurn('player2');
-      console.log('JOINED THE ROOM', paramsRoom)
-    } else {
       const getDeck = async () => {
         const deck_id = await createDeck(1);
         setDeckId(deck_id)
       }
+      // means you are player 2
+      if (!deckId) {
+        getDeck()
+      }
+      if (!room) {
+        socket.emit('join', paramsRoom);
+        setRoom(paramsRoom);
+        setTurn('player2');
+        console.log('JOINED THE ROOM', paramsRoom)
+      }
+    } else {
       // means you are player 1
       const newRoomName = random();
+      console.log('CREATED THE ROOM:', newRoomName)
       socket.emit('create', newRoomName);
-      setRoom(newRoomName);
-      setTurn('player1');
-      setCardState(new CardData()) 
-      getDeck()
-      socket.emit('setDeck', JSON.stringify(deckId, room))
-      console.log(deckId)
+      setRoom(newRoomName);      
     }
-}, [paramsRoom]);
+  }, [paramsRoom]);
   
-console.log('RENDERED THE WHOLE DAMN GAME')
   
   return (
     <div className="Game">
+      <div id="wait-for-opponent" className={hasOpponent? 'hidden':''}>
+
       <button className="btn" onClick={() => setShare(!share)}>
         Share
       </button>
@@ -267,15 +282,17 @@ console.log('RENDERED THE WHOLE DAMN GAME')
           <>
             <br />
             <br />
-            Share link: <input type="text" value={`${window.location.href}?room=${room}`} readOnly />
+            Share link: 
+            <br />
+            {window.location.href}?room={room}
           </>
         ) : null}
         <br />
         <br />
         <br />
         {hasOpponent ? '' : 'Waiting for opponent...'}
-        <p></p> 
-          <div className="gameBoard grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center text-apple-green">
+        </div>
+        <div className="gameBoard grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center text-apple-green">
             <div></div>
             <div className="text-inherit">
               <CardGrid setPlayerCards={setP2Cards} 
