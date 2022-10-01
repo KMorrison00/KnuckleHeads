@@ -1,5 +1,6 @@
-import React, {useEffect, useState, useCallback} from "react";
+import React, {useEffect, useState, useRef} from "react";
 import { CardGrid } from "./CardGrid";
+import { OppCardGrid } from "./OppCardGrid";
 import { Card } from "./Card"
 import CardBack from './images/CardBack.png'
 import {createDeck, drawCard} from './Api';
@@ -9,11 +10,23 @@ import io from 'socket.io-client';
 import { useLocation } from 'react-router-dom';
 
 const Game = () => {
+  const initGrid = () => {
+    let initGrid = [[], [], []];
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+            let newCard = new CardData();
+            initGrid[i].push(newCard);
+        }
+    }
+    return initGrid
+  }
   const [turn, setTurn] = useState('player1');
   const [deckId, setDeckId] = useState(null);
+  const deckIsCreated = useRef(false)
+  const myTurn = useRef(false);
   // ADD RESHUFFLING OF DECK AT SOME POINT
-  const [p1Cards, setP1Cards] = useState([[],[],[]]);
-  const [p2Cards, setP2Cards] = useState([[],[],[]]);
+  const [p1Cards, setP1Cards] = useState(initGrid());
+  const [p2Cards, setP2Cards] = useState(initGrid());
   const [p1Scores, setP1Scores] = useState([0,0,0,0]);
   const [p2Scores, setP2Scores] = useState([0,0,0,0]);
   const [hasOpponent, setHasOpponent] = useState(false);
@@ -22,7 +35,6 @@ const Game = () => {
   const playerMap = {'player1': [p1Cards, setP1Scores], 'player2': [p2Cards, setP2Scores]}
   const inversePlayerMap = {'player1': ['player2', p2Cards, setP2Scores],
                             'player2': ['player1', p1Cards, setP1Scores]}
-  const [sentDeck, setSentDeck] = useState(false)
   const [share, setShare] = useState(false);
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -52,6 +64,7 @@ const Game = () => {
   const changeTurn = () => {
     console.log('HIIIIII IM CHANGEING TURN', room)
     socket.emit('reqTurn', JSON.stringify({ 'p1Cards': p1Cards, 'p2Cards': p2Cards, 'room':room}));
+    myTurn.current = false
   };
 
 
@@ -193,9 +206,14 @@ const Game = () => {
   useEffect(() => {
     
     socket.on('playerTurn', (json) => {
-      // flip because other player has flipped representation
-      setP1Cards(JSON.parse(json).p2Cards)
-      setP2Cards(JSON.parse(json).p1Cards)
+      if (!myTurn.current) {
+        console.log('WAS SENT TURN DATA AND ITS MY TURN NOW')
+        // flip because other player has flipped representation
+        setP1Cards(JSON.parse(json).p2Cards)
+        setP2Cards(JSON.parse(json).p1Cards)
+        setTurn('player1')
+        myTurn.current = true;
+      }
     });
 
     socket.on('restart', () => {
@@ -211,6 +229,7 @@ const Game = () => {
     socket.on('deckID', (deckID) => {
       console.log('GOT SENT A DECK ID', JSON.parse(deckID).deckId)
       setDeckId(JSON.parse(deckID).deckId)
+      deckIsCreated.current = true
     })
   
   },
@@ -237,12 +256,12 @@ const Game = () => {
 
   
   useEffect(() => {
-    if (deckId && !sentDeck) {
+    if (deckId && !deckIsCreated.current) {
       console.log('SENDING DECKID', deckId)
       socket.emit('setDeck', JSON.stringify({'deckId': deckId, 'room': room}));
-      setSentDeck(true)
+      deckIsCreated.current = true
     }
-  }, [deckId, sentDeck])
+  }, [deckId])
 
 
   useEffect(() => {
@@ -267,13 +286,14 @@ const Game = () => {
       console.log('CREATED THE ROOM:', newRoomName)
       socket.emit('create', newRoomName);
       setRoom(newRoomName);      
+      myTurn.current = true;
     }
   }, [paramsRoom]);
   
   
   return (
     <div className="Game">
-      <div id="wait-for-opponent" className={hasOpponent? 'hidden':''}>
+      <div id="waiting" className={hasOpponent? 'hidden':''}>
 
       <button className="btn" onClick={() => setShare(!share)}>
         Share
@@ -295,17 +315,8 @@ const Game = () => {
         <div className="gameBoard grid grid-cols-3 grid-rows-3 grid-rows-auto bg-indigo-blue p-10 place-items-center text-apple-green">
             <div></div>
             <div className="text-inherit">
-              <CardGrid setPlayerCards={setP2Cards} 
-                        choosingGridSpot={choosingGridSpot}
-                        setChoosingGridSpot={setChoosingGridSpot}
-                        opponentsTurn={turn === 'player1'}
-                        opponentCardList={p1Cards}
-                        setOpponentsCards={setP1Cards}
-                        potentialCard={card}
-                        setTurn={()=>{
-                          setTurn(inversePlayerMap[turn][0]);
-                          changeTurn();
-                        }}
+              <OppCardGrid opponentsTurn={turn === 'player1'}
+                           opponentCardList={p1Cards}
                         />
               <div className="grid grid-cols-3 place-items-center gap-4 mt-4 text-inherit">
                 <div className="text-inherit">{p2Scores[0]}</div>
@@ -339,13 +350,14 @@ const Game = () => {
                 <div className="text-inherit">{p1Scores[2]}</div>
               </div>
               <CardGrid setPlayerCards={setP1Cards}
+                        playerCards={p1Cards}
                         choosingGridSpot={choosingGridSpot}
                         setChoosingGridSpot={setChoosingGridSpot}
                         opponentsTurn={turn === 'player2'}
                         opponentCardList={p2Cards}
                         setOpponentsCards={setP2Cards} 
                         potentialCard={card}
-                        setTurn={()=>{
+                        endTurn={()=>{
                           setTurn(inversePlayerMap[turn][0]);
                           changeTurn();
                         }}

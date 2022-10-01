@@ -3,10 +3,9 @@ import { Card } from "./Card";
 import {CardData, getCardValueFromCode} from './Constants';
 
 
-export const CardGrid = ({ setPlayerCards, choosingGridSpot, setChoosingGridSpot,
-                           opponentsTurn, potentialCard, setTurn, setOpponentsCards, 
+export const CardGrid = ({ setPlayerCards, playerCards, choosingGridSpot, setChoosingGridSpot,
+                           opponentsTurn, potentialCard, endTurn, setOpponentsCards, 
                            opponentCardList }) => {
-    const [cardList, setCardList] = useState([[], [], []]);
     const [editedCard, setEditedCard] = useState();
 
     function checkAndRemoveOpposingCards(colNum, playerCardStrVal) {
@@ -27,43 +26,27 @@ export const CardGrid = ({ setPlayerCards, choosingGridSpot, setChoosingGridSpot
     }
 
     useEffect(() => {
-        if (cardList[0].length === 0) {
-            let initGrid = [[], [], []];
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    let newCard = new CardData();
-                    initGrid[i].push(newCard);
-                }
-            }
-            setCardList(initGrid);
-            setPlayerCards(initGrid);
-            console.log("FIRST RENDER GRID");
-        } else {
-            // game is running so we just want to update the grid 
-            if (choosingGridSpot && !opponentsTurn) {
-                let row = editedCard[1][1];
-                let col = editedCard[1][3];
-                let newCardList = cardList.slice();
-                newCardList[row][col] = editedCard[0];
-                console.log(editedCard[0])
-                // check and remove opposing cards
-                checkAndRemoveOpposingCards(col, getCardValueFromCode(editedCard[0].cardVal).strVal)
-                setCardList(newCardList);
-                setPlayerCards(newCardList)
-                setChoosingGridSpot(false);
-                setTurn();
-            }
+        // game is running so we just want to update the grid 
+        if (choosingGridSpot && !opponentsTurn) {
+            let row = editedCard[1][1];
+            let col = editedCard[1][3];
+            let newCardList = playerCards.slice();
+            newCardList[row][col] = editedCard[0];
+            console.log(editedCard[0])
+            // check and remove opposing cards
+            checkAndRemoveOpposingCards(col, getCardValueFromCode(editedCard[0].cardVal).strVal)
+            setPlayerCards(newCardList)
+            setChoosingGridSpot(false);
+            endTurn();
         }
+        
 
     }, [editedCard]);
 
 
-
-  
-    console.log()
     return (<div className={"grid grid-rows-1 gap-4 "}  >
         {
-        cardList.map(
+        playerCards.map(
             (column, i) => (
                 // <--- Notice this, it will wrap all JSX elements below in one single JSX element.
                 <div className={"grid grid-cols-3 gap-4 " + (opponentsTurn ? '' : 'glowOutline')} >
