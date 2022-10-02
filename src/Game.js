@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState, useRef} from "react";
 import { CardGrid } from "./CardGrid";
 import { OppCardGrid } from "./OppCardGrid";
@@ -8,6 +9,8 @@ import { ChooseCardModal } from "./ChooseCardModal";
 import { CardData, getCardValueFromCode } from './Constants';
 import io from 'socket.io-client';
 import { useLocation } from 'react-router-dom';
+
+const socket = io('http://localhost:4000');
 
 const Game = () => {
   const initGrid = () => {
@@ -23,7 +26,6 @@ const Game = () => {
   const [turn, setTurn] = useState('player1');
   const [deckId, setDeckId] = useState(null);
   const deckIsCreated = useRef(false)
-  const myTurn = useRef(false);
   // ADD RESHUFFLING OF DECK AT SOME POINT
   const [p1Cards, setP1Cards] = useState(initGrid());
   const [p2Cards, setP2Cards] = useState(initGrid());
@@ -40,8 +42,7 @@ const Game = () => {
   const params = new URLSearchParams(location.search);
   const paramsRoom = params.get('room');
   const [room, setRoom] = useState();
-  const socket = io('http://localhost:4000');
-  
+
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
     console.log(deckId)
@@ -64,7 +65,6 @@ const Game = () => {
   const changeTurn = () => {
     console.log('HIIIIII IM CHANGEING TURN', room)
     socket.emit('reqTurn', JSON.stringify({ 'p1Cards': p1Cards, 'p2Cards': p2Cards, 'room':room}));
-    myTurn.current = false
   };
 
 
@@ -201,19 +201,25 @@ const Game = () => {
     return false
   }
 
+  //TECH DEBT. refactor this to have 1 object called gameState
+  // or something similar to make all these updates in one go
+  useEffect(() => {
+    calculateAndUpdateScores(p1Cards, setP1Scores)
+  }, [p1Cards, turn])
+
+  useEffect(() => {
+    calculateAndUpdateScores(p2Cards, setP2Scores)
+  }, [p2Cards, turn])
 
   // STARTUP CODE 
   useEffect(() => {
     
     socket.on('playerTurn', (json) => {
-      if (!myTurn.current) {
-        console.log('WAS SENT TURN DATA AND ITS MY TURN NOW')
-        // flip because other player has flipped representation
-        setP1Cards(JSON.parse(json).p2Cards)
-        setP2Cards(JSON.parse(json).p1Cards)
-        setTurn('player1')
-        myTurn.current = true;
-      }
+      console.log('WAS SENT TURN DATA AND ITS MY TURN NOW')
+      // flip because other player has flipped representation
+      setP1Cards(JSON.parse(json).p2Cards)
+      setP2Cards(JSON.parse(json).p1Cards)
+      setTurn('player1')
     });
 
     socket.on('restart', () => {
@@ -239,15 +245,9 @@ const Game = () => {
 
   // Main Game Loop
   useEffect(() => {
-      console.log('ENTERED MAIN GAME LOOP')
-      // make sure card lists have been instantiated
-      if (p2Cards[0].length > 0){
-        calculateAndUpdateScores(inversePlayerMap[turn][1], inversePlayerMap[turn][2])
-        // update both grids so that things like card changes get registered
-        calculateAndUpdateScores(playerMap[turn][0], playerMap[turn][1])
-        if (isGameOver()) {
-          console.log('GAME OVER')
-        }
+    // check if game is over
+      if (isGameOver()) {
+        console.log('GAME OVER')
       }
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps 
@@ -286,7 +286,6 @@ const Game = () => {
       console.log('CREATED THE ROOM:', newRoomName)
       socket.emit('create', newRoomName);
       setRoom(newRoomName);      
-      myTurn.current = true;
     }
   }, [paramsRoom]);
   
@@ -316,7 +315,7 @@ const Game = () => {
             <div></div>
             <div className="text-inherit">
               <OppCardGrid opponentsTurn={turn === 'player1'}
-                           opponentCardList={p1Cards}
+                           opponentCardList={p2Cards}
                         />
               <div className="grid grid-cols-3 place-items-center gap-4 mt-4 text-inherit">
                 <div className="text-inherit">{p2Scores[0]}</div>
