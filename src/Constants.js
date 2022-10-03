@@ -13,6 +13,7 @@ export const CARDVALUES = [
     'AH', '2H', '3H', '4H', '5H', '6H', '7H', '8H', '9H', '0H', 'JH', 'QH', 'KH'
 ]
 
+// takes in a CARVALUE from the list above
 export function getCardValueFromCode(code) {
     let val = code.slice(0, 1);
     let suit = code.slice(-1);

@@ -1,51 +1,50 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "./Card";
-import {CardData, CARDVALUES} from './Constants';
+import {CardData, getCardValueFromCode} from './Constants';
+import { GameObj } from "./Game";
 
-export const CardGrid = ({ setPlayerCards, choosingGridSpot, setChoosingGridSpot,
-                           opponentsTurn, potentialCard, setTurn }) => {
-    const [cardList, setCardList] = useState([[], [], []]);
+export const CardGrid = ({ choosingGridSpot, opponentsTurn, 
+                           potentialCard, endTurn, gameState, setGameState }) => {
+
     const [editedCard, setEditedCard] = useState();
 
-    useEffect(() => {
-        if (cardList[0].length === 0) {
-            let initGrid = [[], [], []];
-            for (let i = 0; i < 3; i++) {
-                for (let j = 0; j < 3; j++) {
-                    let newCard = new CardData();
-                    initGrid[i].push(newCard);
+    function checkAndRemoveOpposingCards(colNum, playerCardStrVal) {
+        let newCardList = gameState.p2Cards.slice()
+        for (let i =0; i< 3; i++) {
+            if (newCardList[i][colNum].cardVal !== '') {
+                let oppCard = getCardValueFromCode(newCardList[i][colNum].cardVal)
+                if (oppCard.strVal === playerCardStrVal) {
+                    newCardList[i][colNum] = new CardData();
                 }
             }
-            setCardList(initGrid);
-            setPlayerCards(initGrid);
-            console.log("FIRST RENDER GRID");
-        } else {
-            // game is running so we just want to update the grid 
-            if (choosingGridSpot && !opponentsTurn) {
-                let row = editedCard[1][1];
-                let col = editedCard[1][3];
-                let newCardList = cardList.slice();
-                newCardList[row][col] = editedCard[0];
-                setCardList(newCardList);
-                setPlayerCards(newCardList)
-                setChoosingGridSpot(false);
-                setTurn();
-            }
         }
+        return newCardList;
 
+    }
+
+    useEffect(() => {
+        // game is running so we just want to update the grid 
+        if (choosingGridSpot && !opponentsTurn) {
+            let clone = {...gameState}
+            let row = editedCard[1][1];
+            let col = editedCard[1][3];
+            clone.p1Cards[row][col] = editedCard[0];
+            console.log(editedCard[0])
+            // check and remove opposing cards
+            let oppCards = checkAndRemoveOpposingCards(col, getCardValueFromCode(editedCard[0].cardVal).strVal)
+            clone.p2Cards = oppCards
+            setGameState(new GameObj(clone))
+            endTurn();
+        }
     }, [editedCard]);
 
 
-
-  
-    console.log()
     return (<div className={"grid grid-rows-1 gap-4 "}  >
         {
-        cardList.map(
+        gameState.p1Cards.map(
             (column, i) => (
-                // <--- Notice this, it will wrap all JSX elements below in one single JSX element.
                 <div className={"grid grid-cols-3 gap-4 " + (opponentsTurn ? '' : 'glowOutline')} >
-                    {column.map( // <--- Also notice here, we have wrapped it in curly braces, because it is an "expression" inside JSX.
+                    {column.map(
                         (card, j) => (
                             <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} className={`outline-none outline-white hover:animate-enlarge`}>
                                 <Card cardData={card}

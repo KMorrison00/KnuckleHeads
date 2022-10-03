@@ -2,7 +2,7 @@ import axios from "axios";
 import CardBack from './images/CardBack.png'
 
 const api = axios.create({
-  baseURL: "https://www.deckofcardsapi.com/api/deck/",
+  baseURL: "http://127.0.0.1:8000/api/deck/",
 });
 
 export const createDeck = async (numDecks) => {
