@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
-export const Card = ({cardData, choosingGridSpot, gridPos,
-                      opponentsTurn, setEditedCard, potentialCard}) => {
-    const clickHoverCondition = choosingGridSpot && !opponentsTurn && cardData.cardVal === '';
+export const Card = ({cardData, choosingGridSpot, gridPos, clickCondition,
+                      setEditedCard, potentialCard}) => {
+    const clickHoverCondition = clickCondition? clickCondition: choosingGridSpot && cardData.cardVal === '';
     return (
       <div >
           <img src={cardData.cardImageUrl} alt={cardData.cardVal}

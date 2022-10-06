@@ -45,6 +45,7 @@ const Game = () => {
   const deckIsCreated = useRef(false)
   // ADD RESHUFFLING OF DECK AT SOME POINT
   const [gameState, setGameState] = useState(new GameObj());
+  const [acePlayed, setAcePlayed] = useState(false);
   const [hasOpponent, setHasOpponent] = useState(false);
   const [choosingGridSpot, setChoosingGridSpot] = useState(false);
   const [card, setCardState] = useState(new CardData());
@@ -108,23 +109,26 @@ const Game = () => {
         // if any entries aren't populated skip checking flush/straights
         if (!valuesArr.includes(NaN)) {
           // if all entries in col make a flush then x 2
+          let FSMultiplier = 1;
           if (colArr[0].suit === colArr[1].suit &&
             colArr[1].suit === colArr[2].suit) {
-              multiplier *= 2; 
+              FSMultiplier *= 2; 
               flush = true;
             }
             // if all entries in col make a flush then x 2
             if (isStraight(colArr)) {
-              multiplier *= 2;
+              FSMultiplier *= 2;
               straight = true;  
             }
             // straight flush gives 6x multiplier
-            multiplier = flush && straight ? 6 : multiplier;
+            console.log('ASKLDJHALKSDJ',colArr)
+            console.log(`FLush= ${flush}, Straight=${straight}`)
+            FSMultiplier = flush && straight ? 6 : FSMultiplier;
             
             // calculate score and exit iteration
             // you cant have doubles or triples if you have a straight or flush
             if (flush || straight) {
-              scores[col] = (valuesArr[0] + valuesArr[1] + valuesArr[2]) * multiplier;
+              scores[col] = (valuesArr[0] + valuesArr[1] + valuesArr[2]) * multiplier * FSMultiplier;
               continue;
             }
           }
@@ -159,7 +163,7 @@ const Game = () => {
       scores[3] = scores[0] + scores[1] + scores[2];
       newScores.push(scores)
     }
-    console.log('ASKLDJHALKSDJ',newGameState.Scores[0], newScores[0])
+    
     newGameState.p1Scores = newScores[0]
     newGameState.p2Scores = newScores[1]
     setGameState(new GameObj({...newGameState}));
@@ -194,7 +198,8 @@ const Game = () => {
     }
     // now calculate the pure num possibilities
     if ((numVals.includes(numVals[0] + 1) && numVals.includes(numVals[0] + 2)) || 
-        (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] - 2))) {
+        (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] - 2)) || 
+        (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] + 1))) {
           return true
       }
     return false
@@ -261,6 +266,14 @@ const Game = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [] // only on startup 
   )
+  useEffect(() => {
+    // when this is true it will be a column index
+    if (acePlayed) {
+      // show the modal
+      let modal = document.getElementById('aceRemoveModal')
+      modal.show()
+    }
+  }, [acePlayed])
 
   // Main Game Loop
   useEffect(() => {
@@ -358,6 +371,13 @@ const Game = () => {
             <div></div>
             <div></div>
             <div className="text-apple-green">
+              <ChooseCardModal 
+                aceColumn={acePlayed}
+                gameState={gameState}
+                setGameState={setGameState}
+                setAcePlayed={setAcePlayed}
+                endTurn={endTurn}
+              />
               <div className="grid place-items-center text-inherit">
                 Total: {gameState.p1Scores[3]}
               </div>
@@ -369,8 +389,9 @@ const Game = () => {
               <CardGrid gameState={gameState}
                         setGameState={setGameState}
                         choosingGridSpot={choosingGridSpot}
-                        opponentsTurn={turn === 'player2'}
                         potentialCard={card}
+                        opponentsTurn={turn === 'player2'}
+                        setAcePlayed={setAcePlayed}
                         endTurn={endTurn}
                         />
             </div>
