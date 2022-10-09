@@ -36,8 +36,17 @@ export const CardGrid = ({ choosingGridSpot, opponentsTurn, setAcePlayed,
             if (getCardValueFromCode(editedCard[0].cardVal).strVal === 'A') {
                 // removal and turn change will then be handled by the 
                 // ace modal
-                setAcePlayed(col)
-                return
+                let emptyCardCount = 0
+                for (let i = 0; i < 3; i++) {
+                    if (newGameState.p2Cards[0][col].cardVal === '') {
+                        emptyCardCount++
+                    }
+                }
+                // dont show modal if theres no enemy cards in the column
+                if (emptyCardCount < 3) {
+                    setAcePlayed(col)
+                    return
+                }
             }
             newGameState.p2Cards = checkAndRemoveOpposingCards(col, getCardValueFromCode(editedCard[0].cardVal).strVal, gameState)
             setGameState(new GameObj(newGameState))
@@ -46,14 +55,16 @@ export const CardGrid = ({ choosingGridSpot, opponentsTurn, setAcePlayed,
     }, [editedCard]);
 
 
-    return (<div className={"grid grid-rows-1 gap-4 "}  >
+    return (<div className={"grid grid-rows-1 gap-4 "}>
         {
         gameState.p1Cards.map(
             (column, i) => (
-                <div className={"grid grid-cols-3 gap-4 " + (opponentsTurn ? '' : 'glowOutline')} >
+                <div className={"grid grid-cols-3 gap-4 " + (opponentsTurn ? '' : 'glowOutline')} key={`row${i}`}>
                     {column.map(
                         (card, j) => (
-                            <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} className={`outline-none outline-white hover:animate-enlarge`}>
+                            <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} 
+                                 className={`outline-none outline-white hover:animate-enlarge`}
+                                 key={`${i}_${j}`}>
                                 <Card cardData={card}
                                       choosingGridSpot={choosingGridSpot} 
                                       setEditedCard={setEditedCard}

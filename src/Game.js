@@ -121,8 +121,6 @@ const Game = () => {
               straight = true;  
             }
             // straight flush gives 6x multiplier
-            console.log('ASKLDJHALKSDJ',colArr)
-            console.log(`FLush= ${flush}, Straight=${straight}`)
             FSMultiplier = flush && straight ? 6 : FSMultiplier;
             
             // calculate score and exit iteration
@@ -140,7 +138,9 @@ const Game = () => {
           if (strValuesArr[1] === strValuesArr[2]) {
             // face card triples are worth more (4x)
             // otherwise just x3, but make sure to account for 2's
-            scores[col] = isFaceCard(strValuesArr[0]) ? 4 * valuesArr[0] : 3 * valuesArr[0] * multiplier;
+            // make sure to sum the value as 3x first
+            console.log('facecard Trips')
+            scores[col] = isFaceCard(strValuesArr[0]) ? 5 * (3 * valuesArr[0]) : 3 * (3 * valuesArr[0]) * multiplier;
             continue;
           }
           // check for face card doubles
@@ -207,23 +207,22 @@ const Game = () => {
 
   function isGameOver() {
     for(let cardList of gameState.Cards) {
-      let cardCount = 0;
-      cardList.forEach((col) => {
-      col.forEach((card) => {
-        if (card.cardVal !== '') {
-          cardCount += 1;
-        }
-      })
-    })
-    if (cardCount === 9) {
-      return true
+        let cardCount = 0;
+        cardList.forEach((col) => {
+          col.forEach((card) => {
+            if (card.cardVal !== '') {
+              cardCount += 1;
+            }
+          })
+        })
+      if (cardCount === 9) {
+        return true
+      }
     }
     return false
   }
-  }
 
   useEffect(() => {
-    console.log('GAME STATE WHEN TRYING TO UPDATE',gameState)
     calculateAndUpdateScores()
   }, [gameState.p1Cards, gameState.p2Cards])
 
@@ -247,6 +246,7 @@ const Game = () => {
     });
 
     socket.on('restart', () => {
+      console.log("recieved restart signal")
       restart();
     });
 
@@ -266,14 +266,6 @@ const Game = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [] // only on startup 
   )
-  useEffect(() => {
-    // when this is true it will be a column index
-    if (acePlayed) {
-      // show the modal
-      let modal = document.getElementById('aceRemoveModal')
-      modal.show()
-    }
-  }, [acePlayed])
 
   // Main Game Loop
   useEffect(() => {
@@ -358,6 +350,7 @@ const Game = () => {
               </div>
             </div>
             <div></div>
+            {/* end of first row */}
             <div></div>
             <div className="grid grid-cols-2 gap-10">
               {/* add on click to move image? */}
@@ -368,7 +361,15 @@ const Game = () => {
                   <Card cardData={card} />
               </button>
             </div>
-            <div></div>
+            <div>
+              <button className={'text-inherit' + (isGameOver() ? '':' hidden')}
+                      onClick={() => {console.log("tried restarting");
+                                      socket.emit('restart', room)
+                                      }}>
+                  Play Again
+              </button>
+            </div>
+            {/* end of second row */}
             <div></div>
             <div className="text-apple-green">
               <ChooseCardModal 
@@ -396,6 +397,7 @@ const Game = () => {
                         />
             </div>
             <div></div>
+            {/* end of last row */}
         </div>
       </div>
     )
