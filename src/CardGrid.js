@@ -31,7 +31,6 @@ export const CardGrid = ({ choosingGridSpot, opponentsTurn, setAcePlayed,
             let row = editedCard[1][1];
             let col = editedCard[1][3];
             newGameState.p1Cards[row][col] = editedCard[0];
-            console.log(editedCard[0])
             // check and remove opposing cards
             if (getCardValueFromCode(editedCard[0].cardVal).strVal === 'A') {
                 // removal and turn change will then be handled by the 
@@ -55,7 +54,7 @@ export const CardGrid = ({ choosingGridSpot, opponentsTurn, setAcePlayed,
     }, [editedCard]);
 
 
-    return (<div className={"grid grid-rows-1 gap-4 "}>
+    return (<div className={"grid grid-rows-1 gap-4 z-10"}>
         {
         gameState.p1Cards.map(
             (column, i) => (

@@ -6,7 +6,6 @@ const api = axios.create({
 });
 
 export const createDeck = async (numDecks) => {
-  console.log('MADE A DECK API CALL TO MAKE A DECK')
   const response = await api.get(`new/shuffle/`, {
     params: {
       deck_count: numDecks,
@@ -17,8 +16,6 @@ export const createDeck = async (numDecks) => {
 
 export const drawCard = async ({ deckId }) => {
   if (deckId != null) {
-    
-    console.log("InsideDrawCardApi", deckId)
     const { data } = await api.get(`${deckId}/draw`, {
       params: {
         count: 1,
@@ -31,6 +28,5 @@ export const drawCard = async ({ deckId }) => {
   }
   const code = ''
   const image = CardBack
-  console.log('TRIED CALLING DRAW CARD WITHOUT A DECK ID')
   return {code, image}
 };

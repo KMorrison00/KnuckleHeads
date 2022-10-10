@@ -1,14 +1,9 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "./Card";
 import { checkAndRemoveOpposingCards } from "./CardGrid";
 import { getCardValueFromCode } from "./Constants";
 
-const indexArr = [1,2,3]
-
-
 export const ChooseCardModal = ({aceColumn, gameState, setGameState, endTurn, setAcePlayed}) => {
-    console.log(aceColumn)
     const [selection, setSelection] = useState('')
 
     const getChoices = () => {
@@ -34,7 +29,6 @@ export const ChooseCardModal = ({aceColumn, gameState, setGameState, endTurn, se
     useEffect(() => {
         if (selection) {
             let newGameState = {...gameState}
-            console.log(selection)
             newGameState.p2Cards = checkAndRemoveOpposingCards(aceColumn, getCardValueFromCode(selection[0].cardVal).strVal, gameState)
             setGameState(newGameState)
             setAcePlayed(false)
