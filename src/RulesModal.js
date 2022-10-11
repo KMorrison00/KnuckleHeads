@@ -80,7 +80,7 @@ export function RulesModal({setShowModal, showModal}) {
                     </div>
                 </div>
                 <div className="relative p-6 flex-auto ">
-                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <img src={images['7C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['8C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['9C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />                        <div className="flex flex-col justify-between p-4 leading-normal">
