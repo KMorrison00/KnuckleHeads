@@ -4,7 +4,7 @@ import { CardGrid } from "./CardGrid";
 import { OppCardGrid } from "./OppCardGrid";
 import { Card } from "./Card";
 import CardBack from "./images/CardBack.png";
-import { createDeck, drawCard } from "./Api";
+import { createDeck, drawCard, shuffleDeck } from "./Api";
 import { ChooseCardModal } from "./ChooseCardModal";
 import { CardData, getCardValueFromCode } from "./Constants";
 import { Fireworks } from "./Fireworks";
@@ -66,15 +66,19 @@ const Game = () => {
 
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
-    console.log(deckId);
-    let { code, image } = await drawCard({ deckId: deckId }).catch((e) => {
+    let { code, image, remaining } = await drawCard({ deckId: deckId }).catch((e) => {
       console.log(e);
     });
+    if (remaining === 0) {
+      await shuffleDeck({ deckId: deckId })
+    }
     setCardState(new CardData({ cardVal: code, cardImageUrl: image }));
     setChoosingGridSpot(true);
   }
 
-  const restart = () => {
+  const restart = async () => {
+    console.log(deckId)
+    await shuffleDeck({ deckId: deckId})
     setGameState(new GameObj());
     setCardState(new CardData());
     setChoosingGridSpot(false);
@@ -270,8 +274,9 @@ const Game = () => {
       });
 
       socket.on("deckID", (deckID) => {
-        setDeckId(JSON.parse(deckID).deckId);
-        deckIsCreated.current = true;
+        let deck_id = JSON.parse(deckID).deckId
+        setDeckId(deck_id);
+        deckIsCreated.current = deck_id;
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -293,7 +298,6 @@ const Game = () => {
 
   useEffect(() => {
     if (deckId && !deckIsCreated.current) {
-      console.log("SENDING DECKID", deckId);
       socket.emit("setDeck", JSON.stringify({ deckId: deckId, room: room }));
       deckIsCreated.current = true;
     }
@@ -313,12 +317,10 @@ const Game = () => {
         socket.emit("join", paramsRoom);
         setRoom(paramsRoom);
         setTurn("player2");
-        console.log("JOINED THE ROOM", paramsRoom);
       }
     } else {
       // means you are player 1
       const newRoomName = random();
-      console.log("CREATED THE ROOM:", newRoomName);
       socket.emit("create", newRoomName);
       setRoom(newRoomName);
     }
@@ -456,7 +458,7 @@ const Game = () => {
           <div className="">
             <div className="grid grid-rows-9 gap-10">
               <div className="row-span-4">
-                <button
+                <button disabled={turn==='player1'? false:true}
                   onClick={() => {
                     drawCardFromDeck();
                   }}

@@ -18,7 +18,7 @@ export const createDeck = async (numDecks) => {
 };
 
 export const drawCard = async ({ deckId }) => {
-  if (deckId != null) {
+  if (deckId) {
     const { data } = await api.get(`${deckId}/draw`, {
       params: {
         count: 1,
@@ -26,12 +26,18 @@ export const drawCard = async ({ deckId }) => {
     });
     
     const { code } = data.cards[0];
+    const {remaining} = data.remaining
     const image = images[`${code}.png`]
     
-    console.log(code)
-    return { code, image };
+    return { code, image, remaining };
   }
   const code = ''
   const image = CardBack
   return {code, image}
 };
+
+export const shuffleDeck = async ({deckId}) => {
+  if (deckId) {
+    await api.get(`${deckId}/shuffle/`);
+  }
+}
