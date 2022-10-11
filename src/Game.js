@@ -363,7 +363,7 @@ const Game = () => {
               Back
             </button>
           </div>
-          <div className="mt-2">
+          <div className="mt-4">
             <button onClick={() => {setShowRulesModal(true)}}>
               Rules
               {/* rules modal? */}
@@ -381,7 +381,7 @@ const Game = () => {
           (hasOpponent ? " " : " hidden")
         }
       >
-        <div className="text-inherit z-10">
+        <div className="opponent-grid text-inherit z-10">
           <OppCardGrid
             opponentsTurn={turn === "player1"}
             gameState={gameState}
@@ -402,15 +402,16 @@ const Game = () => {
               <button
                 className={"p-1 rounded-sm outline-none outline-white bg-indigo-blue" + (isGameOver() ? "" : " hidden")}
                 onClick={() => {
-                  setRoom(null);
-                  window.location.reload(true);
+                  setHasOpponent(false)
+                  window.history.replaceState(null, 'home', '/')
+                  window.location.reload(true)
                 }}
               >
                 Home
               </button>
               {gameState.p2Scores[3] > gameState.p1Scores[3]
-                ? "P2 Wins!"
-                : "P1 Wins!"}
+                ? "Opponent Wins!"
+                : "You Win!"}
               <button
                 className={"p-1 rounded outline-none outline-white bg-indigo-blue" + (isGameOver() ? "" : " hidden")}
                 onClick={() => {
@@ -423,7 +424,7 @@ const Game = () => {
           </div>
         </div>
         {/* needs elevated z-level once the game over animation starts, but not during game due to modal conflicts*/}
-        <div className={"text-inherit " + (isGameOver() ? "z-10" : "") }>
+        <div className={"player-grid text-inherit " + (isGameOver() ? "z-10" : "") }>
           <div className="z-10">
             <div className="grid place-items-center text-inherit">
               Total: {gameState.p1Scores[3]}
@@ -451,27 +452,38 @@ const Game = () => {
             endTurn={endTurn}
           />
         </div>
-        <div className="z-10 row-span-2 row-start-1">
-        <div className="z-10">
-          
-          <div className="grid grid-rows-2 gap-10">
-            <button
-              onClick={() => {
-                drawCardFromDeck();
-              }}
-            >
-              <Card cardData={new CardData({ cardImageUrl: CardBack })} />
-            </button>
-            <button
-              className={
-                "transition outline-none outline-white ease-in-out" +
-                (choosingGridSpot ? "" : " brightness-50")
-              }
-            >
-              <Card cardData={card} />
-            </button>
+        <div className="deck z-10 row-span-2 row-start-1">
+          <div className="">
+            <div className="grid grid-rows-9 gap-10">
+              <div className="row-span-4">
+                <button
+                  onClick={() => {
+                    drawCardFromDeck();
+                  }}
+                >
+                  <Card cardData={new CardData({ cardImageUrl: CardBack })} />
+                </button>
+              </div>
+              <div className="text-2xl text-center row-span-1">
+                <button onClick={() => {setShowRulesModal(true)}}>
+                  Rules
+                  {/* rules modal? */}
+                </button>
+                <RulesModal showModal={showRulesModal} setShowModal={setShowRulesModal}/>
+              </div>
+              <div className="row-span-4">
+                <button
+                  className={
+                    "transition outline-none outline-white ease-in-out" +
+                    (choosingGridSpot ? "" : " brightness-50")
+                  }
+                >
+                  <Card cardData={card} />
+                </button>
+              </div>
+              
+            </div>
           </div>
-        </div>
         </div>
       </div>
     </div>
