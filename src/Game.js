@@ -10,6 +10,7 @@ import { CardData, getCardValueFromCode } from "./Constants";
 import { Fireworks } from "./Fireworks";
 import io from "socket.io-client";
 import { useLocation } from "react-router-dom";
+import { RulesModal } from "./RulesModal";
 
 const socket = io("http://localhost:4000");
 
@@ -57,6 +58,7 @@ const Game = () => {
   const [choosingGridSpot, setChoosingGridSpot] = useState(false);
   const [card, setCardState] = useState(new CardData());
   const [share, setShare] = useState(false);
+  const [showRulesModal, setShowRulesModal] = useState(false);
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const paramsRoom = params.get("room");
@@ -362,10 +364,11 @@ const Game = () => {
             </button>
           </div>
           <div className="mt-2">
-            <button>
+            <button onClick={() => {setShowRulesModal(true)}}>
               Rules
               {/* rules modal? */}
             </button>
+            <RulesModal showModal={showRulesModal} setShowModal={setShowRulesModal}/>
           </div>
         </div>
       </div>

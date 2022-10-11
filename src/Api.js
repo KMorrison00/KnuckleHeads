@@ -1,9 +1,12 @@
 import axios from "axios";
 import CardBack from './images/CardBack.png'
+import  {importAll} from './Utils'
 
 const api = axios.create({
   baseURL: "http://127.0.0.1:8000/api/deck/",
 });
+
+const images = importAll(require.context('./images', false, /\.(png|jpe?g|svg)$/));
 
 export const createDeck = async (numDecks) => {
   const response = await api.get(`new/shuffle/`, {
@@ -22,7 +25,9 @@ export const drawCard = async ({ deckId }) => {
       },
     });
     
-    const { code, image } = data.cards[0];
+    const { code } = data.cards[0];
+    const image = images[`${code}.png`]
+    
     console.log(code)
     return { code, image };
   }
