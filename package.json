@@ -6,11 +6,15 @@
     "axios": "^0.27.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-particles": "^2.3.3",
     "react-router-dom": "^6.4.1",
     "react-scripts": "5.0.1",
+    "react-tsparticles": "1.22.1",
     "socket.io-client": "^4.5.2",
     "styled-components": "^5.3.5",
     "tailwind": "^4.0.0",
+    "tsparticles-preset-fireworks": "^2.3.4",
+    "tsparticles-shape-confetti": "1.7.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

@@ -1,44 +1,64 @@
-import React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Card } from "./Card";
+import { checkAndRemoveOpposingCards } from "./CardGrid";
+import { getCardValueFromCode } from "./Constants";
 
-export const ChooseCardModal = (aceColumn, setAceSelection, enemyCardList) => {
-
-
+export const ChooseCardModal = ({aceColumn, gameState, setGameState, endTurn, setAcePlayed}) => {
     const [selection, setSelection] = useState('')
-    return (
-        <div id="defaultModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 w-full md:inset-0 h-modal md:h-full">
-            <div class="relative p-4 w-full max-w-2xl h-full md:h-auto">
-                {/* <!-- Modal content --> */}
-                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-                    {/* <!-- Modal header --> */}
-                    <div class="flex justify-between items-start p-4 rounded-t border-b dark:border-gray-600">
-                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                            Select a Card
-                        </h3>
-                        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="defaultModal">
-                            <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                            <span class="sr-only">Close modal</span>
-                        </button>
-                    </div>
-                    {/* <!-- Modal body --> */}
-                    <div class="grid grid-cols-3 gap-12">
-                        <div className={enemyCardList[0][aceColumn].cardVal === '' ? 'invisible':'' }>
-                            <img src={enemyCardList[aceColumn][0].cardImageUrl} alt=''></img>
-                        </div>
-                        <div className={enemyCardList[1][aceColumn].cardVal === '' ? 'invisible':'' }>
-                            <img src={enemyCardList[aceColumn][0].cardImageUrl} alt=''></img>
-                        </div>
-                        <div className={enemyCardList[2][aceColumn].cardVal === '' ? 'invisible':'' }>
-                            <img src={ enemyCardList[aceColumn][0].cardImageUrl } alt=''></img>
-                        </div>
-                    </div>
-                    {/* <!-- Modal footer --> */}
-                    <div class="flex items-center p-6 space-x-2 rounded-b border-t border-gray-200 dark:border-gray-600">
-                        <button data-modal-toggle="defaultModal" type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Confirm</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-}
 
+    const getChoices = () => {
+        if (aceColumn !== false) {
+            var output = [];
+            for (let i = 0; i< 3; i++) {
+                if (gameState.p2Cards[i][aceColumn].cardVal) {
+                    output.push(
+                    <div>
+                        <Card cardData={gameState.p2Cards[i][aceColumn]}
+                              clickCondition={true}
+                              potentialCard={gameState.p2Cards[i][aceColumn]}
+                              setEditedCard={setSelection}
+                              className={gameState.p2Cards[i][aceColumn].cardVal}/>
+                    </div>
+                );
+            }
+        }
+        return output
+        }
+    }
+
+    useEffect(() => {
+        if (selection) {
+            let newGameState = {...gameState}
+            newGameState.p2Cards = checkAndRemoveOpposingCards(aceColumn, getCardValueFromCode(selection[0].cardVal).strVal, gameState)
+            setGameState(newGameState)
+            setAcePlayed(false)
+            endTurn()
+        }
+    }, [selection])
+
+    return (<>
+        {aceColumn ? (
+          <>
+            <div
+              className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
+            >
+              <div className="relative w-auto my-6 mx-auto max-w-6xl">
+                {/*content*/}
+                <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-indigo-blue outline-none focus:outline-none">
+                  {/*header*/}
+                  <div className="flex bg-gray-800 items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
+                    <h3 className="text-3xl font-semibold">
+                       Select A Card Value To Remove
+                    </h3>
+                  </div>
+                  {/*body*/}
+                  <div className="grid grid-cols-3 gap-12"> {aceColumn? getChoices() : <></>} </div>
+                  {/*footer*/}
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
+      </>
+    );
+  }
