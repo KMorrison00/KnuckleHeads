@@ -74,7 +74,7 @@ export function RulesModal({setShowModal, showModal}) {
                         <img src={images['3C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />                        <div className="flex flex-col justify-between p-4 leading-normal">
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Flushes</h5>
                             <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
-                                Flushes Are also worth a 2x multiplier
+                                Flushes Apply an extra 2x multiplier
                             </p>
                         </div>
                     </div>
@@ -86,7 +86,7 @@ export function RulesModal({setShowModal, showModal}) {
                         <img src={images['9C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />                        <div className="flex flex-col justify-between p-4 leading-normal">
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Straight Flushes</h5>
                             <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
-                                Striaght Flushes are worth a 6x multiplier
+                                Striaght Flushes Apply a 6x multiplier
                             </p>
                         </div>
                     </div>
@@ -104,7 +104,8 @@ export function RulesModal({setShowModal, showModal}) {
                         <div className="flex flex-col justify-between p-4 leading-normal">
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Aces</h5>
                             <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
-                                Aces are able to be any card value for opponent card removal purposes.
+                                Aces are able to mimic any card value that is in the opposing column.
+                                This means that you can remove any value from the opposing column with an ace
                                 They are still only worth 1.
                             </p>
                         </div>
@@ -116,7 +117,9 @@ export function RulesModal({setShowModal, showModal}) {
                         <div className="flex flex-col justify-between p-4 leading-normal">
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Twos</h5>
                             <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
-                                Twos add an additional 2x multiplier to the column its in. Also worth two
+                                Twos apply 2x multiplier to the column its in. This multiplier is bonus
+                                to the other multipliers like doubles, triples, straights and flushes.
+                                They have a base value of 2. 
                             </p>
                         </div>
                     </div>

@@ -8,6 +8,7 @@ import { createDeck, drawCard, shuffleDeck } from "./Api";
 import { ChooseCardModal } from "./ChooseCardModal";
 import { CardData, getCardValueFromCode } from "./Constants";
 import { Fireworks } from "./Fireworks";
+import { random } from "./Utils";
 import io from "socket.io-client";
 import { useLocation } from "react-router-dom";
 import { RulesModal } from "./RulesModal";
@@ -25,6 +26,7 @@ const initGrid = () => {
   return initGrid;
 };
 
+// this represents the current game state
 export class GameObj {
   constructor({
     p1Cards = initGrid(),
@@ -41,11 +43,7 @@ export class GameObj {
   }
 }
 
-const random = () => {
-  return Array.from(Array(8), () =>
-    Math.floor(Math.random() * 36).toString(36)
-  ).join("");
-};
+
 
 const Game = () => {
   const [turn, setTurn] = useState("player1");
@@ -56,9 +54,10 @@ const Game = () => {
   const [acePlayed, setAcePlayed] = useState(false);
   const [hasOpponent, setHasOpponent] = useState(false);
   const [choosingGridSpot, setChoosingGridSpot] = useState(false);
-  const [card, setCardState] = useState(new CardData());
+  const [drawnCard, setDrawnCardState] = useState(new CardData());
   const [share, setShare] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
+  const gameOver = useRef(false);
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const paramsRoom = params.get("room");
@@ -72,7 +71,7 @@ const Game = () => {
     if (remaining === 0) {
       await shuffleDeck({ deckId: deckId })
     }
-    setCardState(new CardData({ cardVal: code, cardImageUrl: image }));
+    setDrawnCardState(new CardData({ cardVal: code, cardImageUrl: image }));
     setChoosingGridSpot(true);
   }
 
@@ -80,9 +79,10 @@ const Game = () => {
     console.log(deckId)
     await shuffleDeck({ deckId: deckId})
     setGameState(new GameObj());
-    setCardState(new CardData());
+    setDrawnCardState(new CardData());
     setChoosingGridSpot(false);
     setTurn("player1");
+    gameOver.current = false;
   };
 
   const endTurn = () => {
@@ -248,7 +248,6 @@ const Game = () => {
     calculateAndUpdateScores();
   }, [gameState.p1Cards, gameState.p2Cards]);
 
-  // STARTUP CODE
   useEffect(
     () => {
       socket.on("playerTurn", (json) => {
@@ -290,6 +289,7 @@ const Game = () => {
       if (isGameOver()) {
         setChoosingGridSpot(false);
         setTurn("");
+        gameOver.current = true
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -335,11 +335,14 @@ const Game = () => {
           (hasOpponent ? " hidden" : "")
         }
       >
-        <div className=" text-center">
-          <h1 className="text-3xl">Knuckle Heads</h1>
-          <h2 className='text-lg'> (Logo Pending)</h2>
+        <div className="flex flex-row text-center items-center">
+        <img src={require("./images/Spade.png")} alt="spade-icon"></img>
+          <div className="text-4xl">
+            Knuckle Heads
+          </div>
+          <img src={require("./images/Spade.png")} alt="spade-icon"></img>
         </div>
-        <div className="text-center text-xl mb-2">
+        <div className="text-center text-2xl mb-2">
           <div >
             <button
               className={"" + (share ? " hidden" : "")}
@@ -379,59 +382,18 @@ const Game = () => {
       </div>
       <div
         className={
-          "gameBoard grid grid-cols-2 grid-rows-2 grid-rows-auto p-10 place-items-center text-inherit" +
+          "gameBoard grid grid-cols-3 grid-rows-1 grid-rows-auto p-10 place-items-center text-inherit" +
           (hasOpponent ? " " : " hidden")
         }
       >
-        <div className="opponent-grid text-inherit z-10">
-          <OppCardGrid
-            opponentsTurn={turn === "player1"}
-            gameState={gameState}
-          />
-          <div className="grid grid-cols-3 place-items-center gap-4 mt-4 text-inherit z-10">
-            <div>{gameState.p2Scores[0]}</div>
-            <div>{gameState.p2Scores[1]}</div>
-            <div>{gameState.p2Scores[2]}</div>
-          </div>
-          <div className="grid place-items-center z-10">
-            Total: {gameState.p2Scores[3]}
-          </div>
-        
-          {/* Game finished stats and buttons */}
-          <br />
-          <div className={"text-inherit text-xl " + (isGameOver() ? "z-10" : "hidden") }>
-            <div className="grid grid-cols-3 place-items-center">
-              <button
-                className={"p-1 rounded-sm outline-none outline-white bg-indigo-blue" + (isGameOver() ? "" : " hidden")}
-                onClick={() => {
-                  setHasOpponent(false)
-                  window.history.replaceState(null, 'home', '/')
-                  window.location.reload(true)
-                }}
-              >
-                Home
-              </button>
-              {gameState.p2Scores[3] > gameState.p1Scores[3]
-                ? "Opponent Wins!"
-                : "You Win!"}
-              <button
-                className={"p-1 rounded outline-none outline-white bg-indigo-blue" + (isGameOver() ? "" : " hidden")}
-                onClick={() => {
-                  socket.emit("reqRestart", room);
-                }}
-              >
-                Play Again?
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Player Grid */}
         {/* needs elevated z-level once the game over animation starts, but not during game due to modal conflicts*/}
-        <div className={"player-grid text-inherit " + (isGameOver() ? "z-10" : "") }>
-          <div className="z-10">
+        <div className={"player-grid text-inherit md:col-start-1 " + (gameOver.current ? "z-10" : "") }>
+          <div className="player-scores">
             <div className="grid place-items-center text-inherit">
-              Total: {gameState.p1Scores[3]}
+              Your Total: {gameState.p1Scores[3]}
             </div>
-            <div className="grid grid-cols-3 place-items-center gap-4 mb-4 text-inherit">
+            <div className="grid grid-cols-3 place-items-center gap-4 mt-4 mb-4 text-inherit">
               <div>{gameState.p1Scores[0]}</div>
               <div>{gameState.p1Scores[1]}</div>
               <div>{gameState.p1Scores[2]}</div>
@@ -448,48 +410,89 @@ const Game = () => {
             gameState={gameState}
             setGameState={setGameState}
             choosingGridSpot={choosingGridSpot}
-            potentialCard={card}
+            potentialCard={drawnCard}
             opponentsTurn={turn === "player2"}
             setAcePlayed={setAcePlayed}
             endTurn={endTurn}
           />
         </div>
-        <div className="deck z-10 row-span-2 row-start-1">
-          <div className="">
-            <div className="grid grid-rows-9 gap-10">
-              <div className="row-span-4">
-                <button disabled={turn==='player1'? false:true}
-                  onClick={() => {
-                    drawCardFromDeck();
-                  }}
-                >
-                  <Card cardData={new CardData({ cardImageUrl: CardBack })} />
-                </button>
-              </div>
-              <div className="text-2xl text-center row-span-1">
+        <div className={"deck z-10 md:col-start-2 text-inherit p-2"}>
+          {/* Draw/Discard piles */}
+          <div className="grid grid-cols-1 gap-12 place-items-center">
+            <div className={"" + (gameOver.current  ? " hidden" : "")}>
+              <button disabled={turn==='player1'? false:true}
+                onClick={() => {
+                  drawCardFromDeck();
+                }}
+              >
+                <Card cardData={new CardData({ cardImageUrl: CardBack })} />
+              </button>
+            </div>
+            <div className={"text-center z-10 md:text-2xl"} >
+              <div className={"rules-modal" + (gameOver.current  ? " hidden" : "")}>
                 <button onClick={() => {setShowRulesModal(true)}}>
                   Rules
                   {/* rules modal? */}
                 </button>
                 <RulesModal showModal={showRulesModal} setShowModal={setShowRulesModal}/>
               </div>
-              <div className="row-span-4">
+              <div className={"grid grid-rows-3 gap-4 place-items-center end-game-buttons" + (gameOver.current  ? "" : " hidden") }>
                 <button
-                  className={
-                    "transition outline-none outline-white ease-in-out" +
-                    (choosingGridSpot ? "" : " brightness-50")
-                  }
+                    className={"p-1 rounded-sm outline-none outline-white bg-indigo-blue"}
+                    onClick={() => {
+                      setHasOpponent(false)
+                      window.history.replaceState(null, 'home', '/')
+                      window.location.reload(true)
+                    }}
+                  >
+                  Home
+                </button>
+                {gameState.p2Scores[3] > gameState.p1Scores[3] ? "Opponent Wins!": "You Win!"}
+                <button
+                  className={"p-1 rounded outline-none outline-white bg-indigo-blue"}
+                  onClick={() => {
+                    socket.emit("reqRestart", room);
+                  }}
                 >
-                  <Card cardData={card} />
+                  Play Again?
                 </button>
               </div>
-              
+            </div>
+            <div className={"" + (gameOver.current  ? " hidden" : "")}>
+              <button
+                className={
+                  "transition outline-none outline-white ease-in-out" +
+                  (choosingGridSpot ? "" : " brightness-50")
+                }
+              >
+                <Card cardData={drawnCard} />
+              </button>
             </div>
           </div>
         </div>
+        <div className="opponent-grid text-inherit z-10 md:col-start-3">
+          {/* Game finished stats and buttons */}
+          <div className="opponent-scores">
+            <div className="grid place-items-center">
+              Opponent Total: {gameState.p2Scores[3]}
+            </div>
+            <div className="grid grid-cols-3 place-items-center gap-4 mt-4 mb-4 text-inherit z-10">
+              <div>{gameState.p2Scores[0]}</div>
+              <div>{gameState.p2Scores[1]}</div>
+              <div>{gameState.p2Scores[2]}</div>
+            </div>
+          </div>
+          <OppCardGrid
+            opponentsTurn={turn === "player1"}
+            gameState={gameState}
+          />
+        </div>
+        
       </div>
     </div>
   );
 };
 
 export default Game;
+
+
