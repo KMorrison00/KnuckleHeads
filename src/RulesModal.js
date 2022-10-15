@@ -63,6 +63,7 @@ export function RulesModal({setShowModal, showModal}) {
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Straights</h5>
                             <p className="mb-3 font-normal text-left text-gray-300">
                                 Straights apply an extra 2x multiplier
+                                note: straights do not connect from king to ace
                             </p>
                         </div>
                     </div>
