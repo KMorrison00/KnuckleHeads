@@ -245,6 +245,11 @@ const Game = () => {
   }
 
   useEffect(() => {
+    // disable the deck button so players can only draw once per turn
+    document.getElementById('deck-btn').disabled = true;
+  }, [drawnCard])
+
+  useEffect(() => {
     calculateAndUpdateScores();
   }, [gameState.p1Cards, gameState.p2Cards]);
 
@@ -420,7 +425,7 @@ const Game = () => {
           {/* Draw/Discard piles */}
           <div className="grid grid-cols-1 gap-12 place-items-center">
             <div className={"" + (gameOver.current  ? " hidden" : "")}>
-              <button disabled={turn==='player1'? false:true}
+              <button id={"deck-btn"} disabled={turn==='player1' ? false:true}
                 onClick={() => {
                   drawCardFromDeck();
                 }}
