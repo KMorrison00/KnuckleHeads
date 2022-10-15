@@ -31,11 +31,11 @@ export function RulesModal({setShowModal, showModal}) {
                 </div>
                 {/*body*/}
                 <div className="relative p-6 flex-auto ">
-                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <img src={images['CardBack.png']} className="object-cover w-full h-96 rounded-t-lg md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <div className="flex flex-col justify-between p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">General Gameplay</h5>
-                            <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">General Gameplay</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300 ">
                                 Your objective is to have the highest point score by the end of the game.
                                 The game ends when one player fills their entire 3x3 grid, then total scores are compared
                                 Each card has its displayed point value except for face cards which are worth 5.
@@ -47,33 +47,33 @@ export function RulesModal({setShowModal, showModal}) {
                     </div>
                 </div>
                 <div className="relative p-6 flex-auto">
-                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex flex-col items-center rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <div className="flex flex-col justify-center p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Multipliers</h5>
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Multipliers</h5>
                         </div>
                     </div>
                 </div>
 
                 <div className="relative p-6 flex-auto ">
-                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <img src={images['4H.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['5S.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['6C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <div className="flex flex-col justify-between p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Straights</h5>
-                            <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Straights</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300">
                                 Straights Apply an extra 2x multiplier
                             </p>
                         </div>
                     </div>
                 </div>
                 <div className="relative p-6 flex-auto ">
-                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <img src={images['0C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['KC.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['3C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />                        <div className="flex flex-col justify-between p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Flushes</h5>
-                            <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Flushes</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300">
                                 Flushes Apply an extra 2x multiplier
                             </p>
                         </div>
@@ -84,26 +84,26 @@ export function RulesModal({setShowModal, showModal}) {
                         <img src={images['7C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['8C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['9C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />                        <div className="flex flex-col justify-between p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Straight Flushes</h5>
-                            <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Straight Flushes</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300">
                                 Striaght Flushes Apply a 6x multiplier
                             </p>
                         </div>
                     </div>
                 </div>
                 <div className="relative p-6 flex-auto">
-                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <div className="flex flex-col justify-center p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Special Cards</h5>
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Special Cards</h5>
                         </div>
                     </div>
                 </div>
                 <div className="relative p-6 flex-auto ">
-                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <img src={images['AS.png']} className="object-cover w-full h-96 rounded-t-lg md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <div className="flex flex-col justify-between p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Aces</h5>
-                            <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Aces</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300">
                                 Aces are able to mimic any card value that is in the opposing column.
                                 This means that you can remove any value from the opposing column with an ace
                                 They are still only worth 1.
@@ -112,11 +112,11 @@ export function RulesModal({setShowModal, showModal}) {
                     </div>
                 </div>
                 <div className="relative p-6 flex-auto ">
-                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <img src={images['2S.png']} className="object-cover w-full h-96 rounded-t-lg md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <div className="flex flex-col justify-between p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Twos</h5>
-                            <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Twos</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300">
                                 Twos apply 2x multiplier to the column its in. This multiplier is bonus
                                 to the other multipliers like doubles, triples, straights and flushes.
                                 They have a base value of 2. 
@@ -125,11 +125,11 @@ export function RulesModal({setShowModal, showModal}) {
                     </div>
                 </div>
                 <div className="relative p-6 flex-auto ">
-                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl dark:border-gray-700 dark:bg-gray-800">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <img src={images['KS.png']} className="object-cover w-full h-96 rounded-t-lg md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <div className="flex flex-col justify-between p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Face Cards</h5>
-                            <p className="mb-3 font-normal text-left text-gray-700 dark:text-gray-400">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Face Cards</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300">
                                 While only worth 5 all face cards have higher multipliers than regular cards 
                                 for pairs and triples. It is 3x for doubles instead of 2x and 5x for triples instead of 3x
                             </p>
