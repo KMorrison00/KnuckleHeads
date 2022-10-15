@@ -3,7 +3,7 @@ import CardBack from './images/CardBack.png'
 import  {importAll} from './Utils'
 
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api/deck/",
+  baseURL: "https://www.deckofcardsapi.com/api/deck/",
 });
 
 const images = importAll(require.context('./images', false, /\.(png|jpe?g|svg)$/));
