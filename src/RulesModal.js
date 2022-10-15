@@ -1,5 +1,4 @@
 import React from "react";
-import CardBack from "./images/CardBack.png";
 import { importAll } from "./Utils";
 
 
