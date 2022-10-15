@@ -13,7 +13,9 @@ import io from "socket.io-client";
 import { useLocation } from "react-router-dom";
 import { RulesModal } from "./RulesModal";
 
-const socket = io("http://localhost:4000");
+const socket = io("https://knuckleheads-socket-server.glitch.me", {extraHeaders: {
+  'user-agent': 'game-client'
+}});
 
 const initGrid = () => {
   let initGrid = [[], [], []];
