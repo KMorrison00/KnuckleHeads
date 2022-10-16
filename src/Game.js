@@ -51,6 +51,7 @@ const Game = () => {
   const [turn, setTurn] = useState("player1");
   const [deckId, setDeckId] = useState(null);
   const deckIsCreated = useRef(false);
+  const deckBtnRef = useRef();
   // ADD RESHUFFLING OF DECK AT SOME POINT
   const [gameState, setGameState] = useState(new GameObj());
   const [acePlayed, setAcePlayed] = useState(false);
@@ -223,10 +224,13 @@ const Game = () => {
       }
     }
     // now calculate the pure num possibilities
+    // make sure we have no face cards since we're doing value checks here
+    // rather than string checks
     else if (
-      (numVals.includes(numVals[0] + 1) && numVals.includes(numVals[0] + 2)) ||
+      !(strVals.includes("J")||strVals.includes("Q") || strVals.includes("K")) &&
+      ((numVals.includes(numVals[0] + 1) && numVals.includes(numVals[0] + 2)) ||
       (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] - 2)) ||
-      (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] + 1))
+      (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] + 1)))
     ) {
       return true;
     }
@@ -249,11 +253,6 @@ const Game = () => {
     }
     return false;
   }
-
-  useEffect(() => {
-    // disable the deck button so players can only draw once per turn
-    document.getElementById('deck-btn').disabled = true;
-  }, [drawnCard])
 
   useEffect(() => {
     calculateAndUpdateScores();
@@ -296,6 +295,9 @@ const Game = () => {
   // Main Game Loop
   useEffect(
     () => {
+      if (turn === 'player1') {
+        deckBtnRef.current = true;
+      }
       // check if game is over
       if (isGameOver()) {
         setChoosingGridSpot(false);
@@ -435,13 +437,15 @@ const Game = () => {
             endTurn={endTurn}
           />
         </div>
-        <div className={"deck z-10 md:col-start-2 text-inherit p-2"}>
+        <div className={"non-player-objects z-20 md:col-start-2 text-inherit p-2"}>
           {/* Draw/Discard piles */}
           <div className="grid grid-cols-1 gap-12 place-items-center">
             <div className={"" + (gameOver.current  ? " hidden" : "")}>
-              <button id={"deck-btn"} disabled={turn==='player1' ? false:true}
+              <button id={"deck-btn"} ref={deckBtnRef} disabled={turn==='player1' &&
+                                                     deckBtnRef.current ? false:true}
                 onClick={() => {
                   drawCardFromDeck();
+                  deckBtnRef.current = false;
                 }}
               >
                 <Card cardData={new CardData({ cardImageUrl: CardBack })} />
