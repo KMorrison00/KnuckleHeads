@@ -11,7 +11,8 @@ export const OppCardGrid = ({opponentsTurn, gameState}) => {
                     {column.map( // <--- Also notice here, we have wrapped it in curly braces, because it is an "expression" inside JSX.
                         (card, j) => (
                             <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} 
-                                 className={`outline-none outline-white hover:animate-enlarge`}
+                            className={`outline-none hover:animate-enlarge ` + 
+                            (j === 0? 'outline-green-600': j === 1 ? 'outline-purple-500': j===2? 'outline-cyan-400': '')}
                                  key={`${i}_${j}`}>
                                 <Card cardData={card}
                                       opponentsTurn={opponentsTurn}
