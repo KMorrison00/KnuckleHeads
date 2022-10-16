@@ -51,6 +51,7 @@ const Game = () => {
   const [turn, setTurn] = useState("player1");
   const [deckId, setDeckId] = useState(null);
   const deckIsCreated = useRef(false);
+  const deckBtnRef = useRef();
   // ADD RESHUFFLING OF DECK AT SOME POINT
   const [gameState, setGameState] = useState(new GameObj());
   const [acePlayed, setAcePlayed] = useState(false);
@@ -59,6 +60,7 @@ const Game = () => {
   const [drawnCard, setDrawnCardState] = useState(new CardData());
   const [share, setShare] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
+  const [reset, setReset] = useState(false);
   const gameOver = useRef(false);
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -67,25 +69,30 @@ const Game = () => {
 
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
-    let { code, image, remaining } = await drawCard({ deckId: deckId }).catch((e) => {
+    let { code, image} = await drawCard({ deckId: deckId }).catch((e) => {
       console.log(e);
     });
-    if (remaining === 0) {
-      await shuffleDeck({ deckId: deckId })
-    }
     setDrawnCardState(new CardData({ cardVal: code, cardImageUrl: image }));
     setChoosingGridSpot(true);
   }
 
-  const restart = async () => {
-    console.log(deckId)
-    await shuffleDeck({ deckId: deckId})
-    setGameState(new GameObj());
-    setDrawnCardState(new CardData());
-    setChoosingGridSpot(false);
-    setTurn("player1");
-    gameOver.current = false;
-  };
+  useEffect(() => {
+    const restart = async () => {
+      console.log(deckId)
+      await shuffleDeck({deckId: deckId})
+      setGameState(new GameObj());
+      setDrawnCardState(new CardData());
+      setChoosingGridSpot(false);
+      setTurn("player1");
+      gameOver.current = false;
+      setReset(false)
+    };
+    if (reset) {
+      restart()
+    }
+
+  }, [reset])
+  
 
   const endTurn = () => {
     setChoosingGridSpot(false);
@@ -223,10 +230,13 @@ const Game = () => {
       }
     }
     // now calculate the pure num possibilities
+    // make sure we have no face cards since we're doing value checks here
+    // rather than string checks
     else if (
-      (numVals.includes(numVals[0] + 1) && numVals.includes(numVals[0] + 2)) ||
+      !(strVals.includes("J")||strVals.includes("Q") || strVals.includes("K")) &&
+      ((numVals.includes(numVals[0] + 1) && numVals.includes(numVals[0] + 2)) ||
       (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] - 2)) ||
-      (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] + 1))
+      (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] + 1)))
     ) {
       return true;
     }
@@ -251,11 +261,6 @@ const Game = () => {
   }
 
   useEffect(() => {
-    // disable the deck button so players can only draw once per turn
-    document.getElementById('deck-btn').disabled = true;
-  }, [drawnCard])
-
-  useEffect(() => {
     calculateAndUpdateScores();
   }, [gameState.p1Cards, gameState.p2Cards]);
 
@@ -275,7 +280,7 @@ const Game = () => {
       });
 
       socket.on("restart", () => {
-        restart();
+        setReset(true);
       });
 
       socket.on("opponent_joined", () => {
@@ -296,6 +301,9 @@ const Game = () => {
   // Main Game Loop
   useEffect(
     () => {
+      if (turn === 'player1') {
+        deckBtnRef.current = true;
+      }
       // check if game is over
       if (isGameOver()) {
         setChoosingGridSpot(false);
@@ -435,13 +443,15 @@ const Game = () => {
             endTurn={endTurn}
           />
         </div>
-        <div className={"deck z-10 md:col-start-2 text-inherit p-2"}>
+        <div className={"non-player-objects z-20 md:col-start-2 text-inherit p-2"}>
           {/* Draw/Discard piles */}
           <div className="grid grid-cols-1 gap-12 place-items-center">
             <div className={"" + (gameOver.current  ? " hidden" : "")}>
-              <button id={"deck-btn"} disabled={turn==='player1' ? false:true}
+              <button id={"deck-btn"} ref={deckBtnRef} disabled={turn==='player1' &&
+                                                     deckBtnRef.current ? false:true}
                 onClick={() => {
                   drawCardFromDeck();
+                  deckBtnRef.current = false;
                 }}
               >
                 <Card cardData={new CardData({ cardImageUrl: CardBack })} />
@@ -466,7 +476,7 @@ const Game = () => {
                   >
                   Home
                 </button>
-                {gameState.p2Scores[3] > gameState.p1Scores[3] ? "Opponent Wins!": "You Win!"}
+                {gameState.p2Scores[3] > gameState.p1Scores[3] ? "Opponent Wins!": gameState.p2Scores[3] === gameState.p1Scores[3]? "Tie" : "You Win!"}
                 <button
                   className={"p-1 rounded outline-none outline-white bg-indigo-blue"}
                   onClick={() => {
