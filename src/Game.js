@@ -14,6 +14,8 @@ import { useLocation } from "react-router-dom";
 import { RulesModal } from "./RulesModal";
 
 const socket = io("https://knuckleheads-socket-server.glitch.me", {});
+// local dev socket server
+// const socket = io("http://localhost:4000", {}); 
 
 const initGrid = () => {
   let initGrid = [[], [], []];
@@ -140,6 +142,10 @@ const Game = () => {
           }
           // straight flush gives 6x multiplier
           FSMultiplier = flush && straight ? 6 : FSMultiplier;
+          // royal flush gets an extra x3 to make total score 225
+          if (flush && isFaceCard(colArr[0]) && isFaceCard(colArr[1] && isFaceCard(colArr[2]))) {
+            FSMultiplier *= 2
+          }
 
           // calculate score and exit iteration
           // you cant have doubles or triples if you have a straight or flush
@@ -217,7 +223,7 @@ const Game = () => {
       }
     }
     // now calculate the pure num possibilities
-    if (
+    else if (
       (numVals.includes(numVals[0] + 1) && numVals.includes(numVals[0] + 2)) ||
       (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] - 2)) ||
       (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] + 1))
@@ -347,7 +353,7 @@ const Game = () => {
           </div>
           <img src={require("./images/Spade.png")} alt="spade-icon"></img>
         </div>
-        <div className="text-center text-2xl mb-2">
+        <div className="items-center text-center text-2xl mb-2">
           <div >
             <button
               className={"" + (share ? " hidden" : "")}
@@ -355,23 +361,31 @@ const Game = () => {
               >
               Create Game
             </button>
-            {share ? (
-              <>
-                <br />
-                Send This Link To a Friend!:
-                <br />
-                <br />
-                {window.location.href}?room={room}
-              </>
-            ) : null}
-            <br />
-            <br />
-            <button
-              className={"" + (share ? "" : " hidden")}
-              onClick={() => setShare(!share)}
-              >
-              Back
-            </button>
+            <div className="">
+              {share ? (
+                <div className="flex flex-col gap-4">
+                  <div>
+                    Send This Link To a Friend!:
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    {/* this icon isnt rendering :( */}
+                    {window.location.href}?room={room}
+                    <button className="h-8 w-8 p-1" onClick={() =>  navigator.clipboard.writeText(`${window.location.href}?room=${room}`)}>
+                        <img  src={require('./images/copy-content.png')} alt='copy content'></img>
+                      </button>
+                  </div>
+                  <div>
+                    <button
+                        className={"" + (share ? "" : " hidden")}
+                        onClick={() => setShare(!share)}
+                        >
+                        Back
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+              
+            </div>
           </div>
           <div className="mt-4">
             <button onClick={() => {setShowRulesModal(true)}}>
