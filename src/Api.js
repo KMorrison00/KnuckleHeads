@@ -36,8 +36,6 @@ export const drawCard = async ({ deckId }) => {
   return {code, image}
 };
 
-export const shuffleDeck = async ({deckId}) => {
-  if (deckId) {
-    await api.get(`${deckId}/shuffle/`);
-  }
+export const shuffleDeck = async ({ deckId }) => {
+  await api.get(`${deckId}/shuffle/`);
 }

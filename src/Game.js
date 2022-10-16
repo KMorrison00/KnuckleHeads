@@ -60,6 +60,7 @@ const Game = () => {
   const [drawnCard, setDrawnCardState] = useState(new CardData());
   const [share, setShare] = useState(false);
   const [showRulesModal, setShowRulesModal] = useState(false);
+  const [reset, setReset] = useState(false);
   const gameOver = useRef(false);
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -68,25 +69,30 @@ const Game = () => {
 
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
-    let { code, image, remaining } = await drawCard({ deckId: deckId }).catch((e) => {
+    let { code, image} = await drawCard({ deckId: deckId }).catch((e) => {
       console.log(e);
     });
-    if (remaining === 0) {
-      await shuffleDeck({ deckId: deckId })
-    }
     setDrawnCardState(new CardData({ cardVal: code, cardImageUrl: image }));
     setChoosingGridSpot(true);
   }
 
-  const restart = async () => {
-    console.log(deckId)
-    await shuffleDeck({ deckId: deckId})
-    setGameState(new GameObj());
-    setDrawnCardState(new CardData());
-    setChoosingGridSpot(false);
-    setTurn("player1");
-    gameOver.current = false;
-  };
+  useEffect(() => {
+    const restart = async () => {
+      console.log(deckId)
+      await shuffleDeck({deckId: deckId})
+      setGameState(new GameObj());
+      setDrawnCardState(new CardData());
+      setChoosingGridSpot(false);
+      setTurn("player1");
+      gameOver.current = false;
+      setReset(false)
+    };
+    if (reset) {
+      restart()
+    }
+
+  }, [reset])
+  
 
   const endTurn = () => {
     setChoosingGridSpot(false);
@@ -274,7 +280,7 @@ const Game = () => {
       });
 
       socket.on("restart", () => {
-        restart();
+        setReset(true);
       });
 
       socket.on("opponent_joined", () => {
@@ -470,7 +476,7 @@ const Game = () => {
                   >
                   Home
                 </button>
-                {gameState.p2Scores[3] > gameState.p1Scores[3] ? "Opponent Wins!": "You Win!"}
+                {gameState.p2Scores[3] > gameState.p1Scores[3] ? "Opponent Wins!": gameState.p2Scores[3] === gameState.p1Scores[3]? "Tie" : "You Win!"}
                 <button
                   className={"p-1 rounded outline-none outline-white bg-indigo-blue"}
                   onClick={() => {
