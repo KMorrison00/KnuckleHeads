@@ -87,7 +87,20 @@ export function RulesModal({setShowModal, showModal}) {
                         <img src={images['9C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />                        <div className="flex flex-col justify-between p-4 leading-normal">
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Straight Flushes</h5>
                             <p className="mb-3 font-normal text-left text-gray-300">
-                                Striaght Flushes apply a 6x multiplier
+                                Straight Flushes apply a 6x multiplier
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div className="relative p-6 flex-auto ">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
+                        <img src={images['JD.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
+                        <img src={images['QD.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
+                        <img src={images['KD.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />                        <div className="flex flex-col justify-between p-4 leading-normal">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Royal Straight Flushes</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300">
+                                Royal Straight Flushes apply an extra 2x on top of the 6x multiplier
+                                for a total of a 12x multiplier 
                             </p>
                         </div>
                     </div>
@@ -145,8 +158,8 @@ export function RulesModal({setShowModal, showModal}) {
                         <div className="flex flex-col justify-between p-4 leading-normal">
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Face Cards</h5>
                             <p className="mb-3 font-normal text-left text-gray-300">
-                                While only worth 5 all face cards have higher multipliers than regular cards 
-                                for pairs and triples. It is 3x for pairs instead of 2x and 5x for triples instead of 3x
+                                While only worth 5 all face cards have higher multipliers than regular cards.
+                                It is 3x for pairs instead of 2x and 5x for triples instead of 3x.
                             </p>
                         </div>
                     </div>
