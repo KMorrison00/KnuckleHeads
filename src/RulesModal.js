@@ -4,6 +4,8 @@ import { importAll } from "./Utils";
 
 const images = importAll(require.context('./images', false, /\.(png|jpe?g|svg)$/));
 
+// rules modals are wordy, break them up more, doubles/triples, general gameplay
+
 export function RulesModal({setShowModal, showModal}) {
   return (<>
       {showModal ? (
@@ -29,19 +31,42 @@ export function RulesModal({setShowModal, showModal}) {
                   </button>
                 </div>
                 {/*body*/}
+                <div className="relative p-6 flex-auto">
+                    <div className="flex flex-col items-center rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
+                        <div className="flex flex-col justify-center p-4 leading-normal">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">General Gameplay</h5>
+                        </div>
+                    </div>
+                </div>
                 <div className="relative p-6 flex-auto ">
                     <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
-                        <img src={images['CardBack.png']} className="object-cover w-full h-96 rounded-t-lg md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" alt="Card Back" />
+                        <img src={images['playerGridExample.png']} className="object-cover w-48 h-96 rounded-t-lg md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <div className="flex flex-col justify-between p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">General Gameplay</h5>
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Overview</h5>
                             <p className="mb-3 font-normal text-left text-gray-300 ">
-                                Your objective is to have the highest point score by the end of the game.
-                                The game ends when one player fills their entire 3x3 grid, then total scores are compared
-                                Each card has its displayed point value except for face cards which are worth 5.
-                                Scores are calculated first by summing the column of a grid and then applying multipliers.
-
+                                {/* super wordy , break into different blocks */}
+                                Each player has a 3x3 grid and your objective is to fill your grid and get the highest
+                                score. Each turn players will draw a card and place it somewhere in their grid. Bonuses
+                                and multipliers are applied based on the cards in each column. The game ends when one
+                                players fills their entire grid
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div className="relative p-6 flex-auto ">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
+                        <img src={images['playerGridExample2.png']} className="object-cover w-48 h-96 rounded-t-lg md:h-auto md:w-48 md:rounded-none md:rounded-l-lg" alt="Card Back" />
+                        <div className="flex flex-col justify-between p-4 leading-normal">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Card Value and Scoring</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300 ">
+                                Each card has its displayed point value (4 are worth 4 points, 7s are worth 7 points etc.)
+                                except for face cards which are worth 5.
+                                <br /><br />
                                 When a card is played, if the opponent has a card or multiple cards of the same value in the
                                 opposing column it will be removed. Cards that are removed do not get reshuffled into the deck
+                                <br />
+                                <br />
+                                Scores are calculated first by summing the column of a grid and then applying multipliers.
                             </p>
                         </div>
                     </div>
@@ -63,6 +88,7 @@ export function RulesModal({setShowModal, showModal}) {
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Straights</h5>
                             <p className="mb-3 font-normal text-left text-gray-300">
                                 Straights apply an extra 2x multiplier
+                                <br />
                                 note: straights do not connect from king to ace
                             </p>
                         </div>
@@ -108,14 +134,32 @@ export function RulesModal({setShowModal, showModal}) {
                 <div className="relative p-6 flex-auto ">
                     <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
                         <img src={images['8H.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
+                        <img src={images['8S.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />                        <div className="flex flex-col justify-between p-4 leading-normal">
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Doubles</h5>
+                            <p className="mb-3 font-normal text-left text-gray-300">
+                                Doubles multiply the card value of the doubles by 2.
+                                <br />
+                                <br />
+                                Ex: Two 8's would be worth <br /> (8 + 8) x 2 = 32. 
+                                <br />
+                                <br />
+                                If another single card is in the column its value will just be added on top.
+                                if a 9 were played it would just 32 + 9. 
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div className="relative p-6 flex-auto ">
+                    <div className="flex flex-col items-center  rounded-lg border shadow-md md:flex-row md:max-w-xl border-gray-700 bg-gray-800">
+                        <img src={images['8H.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['8C.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />
                         <img src={images['8S.png']} className="object-cover w-1/2 h-48 rounded-t-lg md:h-auto md:w-24 md:rounded-none md:rounded-l-lg" alt="Card Back" />                        <div className="flex flex-col justify-between p-4 leading-normal">
-                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Doubles and Triples</h5>
+                            <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Triples</h5>
                             <p className="mb-3 font-normal text-left text-gray-300">
-                                Doubles and triples grant multipliers only to the cards that match.
-                                Two 8's are worth (8 + 8) * 2 = 32. If another single card is in the column
-                                its value will just be added on top for. if it were a 9 it would just 32 + 9. 
-                                Triples just multiply 3x the summed column value 
+                                Triples work the same as doubles except they multiply 3x the card face value
+                                <br />
+                                <br />
+                                using 8 as an example again it would be <br /> (8 + 8 + 8) x 3 = 72
                             </p>
                         </div>
                     </div>
@@ -158,7 +202,7 @@ export function RulesModal({setShowModal, showModal}) {
                         <div className="flex flex-col justify-between p-4 leading-normal">
                             <h5 className="mb-2 text-2xl font-bold tracking-tight text-white">Face Cards</h5>
                             <p className="mb-3 font-normal text-left text-gray-300">
-                                While only worth 5 all face cards have higher multipliers than regular cards.
+                                While only worth 5, all face cards have higher multipliers than regular cards.
                                 It is 3x for pairs instead of 2x and 5x for triples instead of 3x.
                             </p>
                         </div>
