@@ -8,7 +8,7 @@ import { createDeck, drawCard, shuffleDeck } from "./Api";
 import { ChooseCardModal } from "./ChooseCardModal";
 import { CardData, getCardValueFromCode } from "./Constants";
 import { Fireworks } from "./Fireworks";
-import { Stars } from './Stars'
+import { Stars } from "./Stars";
 import { random } from "./Utils";
 import io from "socket.io-client";
 import { useLocation } from "react-router-dom";
@@ -16,10 +16,9 @@ import { RulesModal } from "./RulesModal";
 
 // timer mode??
 
-
 // const socket = io("https://knuckleheads-socket-server.glitch.me", {});
 // local dev socket server
-const socket = io("http://localhost:4000", {}); 
+const socket = io("http://localhost:4000", {});
 
 const initGrid = () => {
   let initGrid = [[], [], []];
@@ -49,8 +48,6 @@ export class GameObj {
   }
 }
 
-
-
 const Game = () => {
   const [turn, setTurn] = useState("player1");
   const [deckId, setDeckId] = useState(null);
@@ -73,7 +70,7 @@ const Game = () => {
 
   // draw card and attach to mouse store temporarily
   async function drawCardFromDeck() {
-    let { code, image} = await drawCard({ deckId: deckId }).catch((e) => {
+    let { code, image } = await drawCard({ deckId: deckId }).catch((e) => {
       console.log(e);
     });
     setDrawnCardState(new CardData({ cardVal: code, cardImageUrl: image }));
@@ -82,20 +79,18 @@ const Game = () => {
 
   useEffect(() => {
     const restart = async () => {
-      console.log(deckId)
-      await shuffleDeck({deckId: deckId})
+      console.log(deckId);
+      await shuffleDeck({ deckId: deckId });
       setGameState(new GameObj());
       setDrawnCardState(new CardData());
       setChoosingGridSpot(false);
       gameOver.current = false;
-      setReset(false)
+      setReset(false);
     };
     if (reset) {
-      restart()
+      restart();
     }
-
-  }, [reset])
-  
+  }, [reset]);
 
   const endTurn = () => {
     setChoosingGridSpot(false);
@@ -153,8 +148,12 @@ const Game = () => {
           // straight flush gives 6x multiplier
           FSMultiplier = flush && straight ? 6 : FSMultiplier;
           // royal flush gets an extra x3 to make total score 225
-          if (flush && isFaceCard(colArr[0]) && isFaceCard(colArr[1] && isFaceCard(colArr[2]))) {
-            FSMultiplier *= 2
+          if (
+            flush &&
+            isFaceCard(colArr[0]) &&
+            isFaceCard(colArr[1] && isFaceCard(colArr[2]))
+          ) {
+            FSMultiplier *= 2;
           }
 
           // calculate score and exit iteration
@@ -236,10 +235,15 @@ const Game = () => {
     // make sure we have no face cards since we're doing value checks here
     // rather than string checks
     else if (
-      !(strVals.includes("J")||strVals.includes("Q") || strVals.includes("K")) &&
+      !(
+        strVals.includes("J") ||
+        strVals.includes("Q") ||
+        strVals.includes("K")
+      ) &&
       ((numVals.includes(numVals[0] + 1) && numVals.includes(numVals[0] + 2)) ||
-      (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] - 2)) ||
-      (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] + 1)))
+        (numVals.includes(numVals[0] - 1) &&
+          numVals.includes(numVals[0] - 2)) ||
+        (numVals.includes(numVals[0] - 1) && numVals.includes(numVals[0] + 1)))
     ) {
       return true;
     }
@@ -292,7 +296,7 @@ const Game = () => {
       });
 
       socket.on("deckID", (deckID) => {
-        let deck_id = JSON.parse(deckID).deckId
+        let deck_id = JSON.parse(deckID).deckId;
         setDeckId(deck_id);
         deckIsCreated.current = deck_id;
       });
@@ -304,13 +308,13 @@ const Game = () => {
   // Main Game Loop
   useEffect(
     () => {
-      if (turn === 'player1') {
+      if (turn === "player1") {
         deckBtnClicked.current = true;
       }
       // check if game is over
       if (isGameOver()) {
         setChoosingGridSpot(false);
-        gameOver.current = true
+        gameOver.current = true;
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -357,62 +361,78 @@ const Game = () => {
         }
       >
         <div className="flex flex-row text-center items-center">
-        <img src={require("./images/Spade.png")} alt="spade-icon"></img>
-          <div className="text-4xl">
-            Knuckle Heads
-          </div>
+          <img src={require("./images/Spade.png")} alt="spade-icon"></img>
+          <div className="text-4xl">Knuckle Heads</div>
           <img src={require("./images/Spade.png")} alt="spade-icon"></img>
         </div>
         <div className="items-center text-center text-2xl mb-2">
-          <div >
+          <div>
             <button
               className={"" + (share ? " hidden" : "")}
               onClick={() => setShare(!share)}
-              >
+            >
               Create Game
             </button>
             <div className="">
               {share ? (
                 <div className="flex flex-col gap-4">
-                  <div>
-                    Send This Link To a Friend!:
-                  </div>
+                  <div>Send This Link To a Friend!:</div>
                   <div className="flex flex-row gap-2">
-                    <button className="flex flex-row gap-2" onClick={() =>  {
-                      navigator.clipboard.writeText(`${window.location.href}?room=${room}`)
-                      setlinkCopied(true);
-                    }}>
-                        {window.location.href}?room={room}
+                    <button
+                      className="flex flex-row gap-2"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `${window.location.href}?room=${room}`
+                        );
+                        setlinkCopied(true);
+                      }}
+                    >
+                      {window.location.href}?room={room}
                       <div>
-                        <img className="h-8 w-8 p-1" 
-                          src={require('./images/copy-content.png')} alt='copy content'></img>
+                        {linkCopied ? (
+                          <img
+                          className="h-8 w-8 p-1 "
+                          src={require("./images/Checkmark.png")}
+                          alt="checkmark"
+                        ></img>
+                        ) : (
+                          <img
+                            className="h-8 w-8 p-1"
+                            src={require("./images/copy-content.png")}
+                            alt="copy content"
+                          ></img>
+                        )}
                       </div>
-                      </button>
-                    <img className={"h-8 w-8 p-1 " + (linkCopied ? '':'hidden')} 
-                          src={require('./images/Checkmark.png')} alt='checkmark'></img>
+                    </button>
                   </div>
                   <div>
                     <button
-                        className={"" + (share ? "" : " hidden")}
-                        onClick={() => {
-                          setShare(!share)
-                          setlinkCopied(!linkCopied)
-                        }}
-                        >
-                        Back
+                      className={"" + (share ? "" : " hidden")}
+                      onClick={() => {
+                        setShare(!share);
+                        setlinkCopied(!linkCopied);
+                      }}
+                    >
+                      Back
                     </button>
                   </div>
                 </div>
               ) : null}
-              
             </div>
           </div>
           <div className="mt-4">
-            <button onClick={() => {setShowRulesModal(true)}}>
+            <button
+              onClick={() => {
+                setShowRulesModal(true);
+              }}
+            >
               Rules
               {/* rules modal? */}
             </button>
-            <RulesModal showModal={showRulesModal} setShowModal={setShowRulesModal}/>
+            <RulesModal
+              showModal={showRulesModal}
+              setShowModal={setShowRulesModal}
+            />
           </div>
         </div>
       </div>
@@ -422,7 +442,6 @@ const Game = () => {
         ) : (
           <Stars />
         )}
-        
       </div>
       <div
         className={
@@ -432,7 +451,12 @@ const Game = () => {
       >
         {/* Player Grid */}
         {/* needs elevated z-level once the game over animation starts, but not during game due to modal conflicts*/}
-        <div className={"player-grid text-inherit md:col-start-1 " + (gameOver.current ? "z-10" : "") }>
+        <div
+          className={
+            "player-grid text-inherit md:col-start-1 " +
+            (gameOver.current ? "z-10" : "")
+          }
+        >
           <div className="player-scores">
             <div className="grid place-items-center text-inherit">
               Your Total: {gameState.p1Scores[3]}
@@ -460,46 +484,80 @@ const Game = () => {
             endTurn={endTurn}
           />
         </div>
-        <div className={"non-player-objects z-20 md:col-start-2 text-inherit p-2"}>
+        <div
+          className={"non-player-objects z-20 md:col-start-2 text-inherit p-2"}
+        >
           {/* Draw/Discard piles */}
           <div className="grid grid-cols-1 gap-12 place-items-center">
             {/* make glow */}
-            <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} 
-                  className={"z-10 " + (gameOver.current  ? " hidden " : "") + 
-                    (deckBtnClicked.current && turn==='player1' ? 'glowOutline' : '')}>
-                <button id={"deck-btn"} ref={deckBtnClicked} 
-                  disabled={turn==='player1' && deckBtnClicked.current ? false:true}
-                  onClick={() => {
-                            drawCardFromDeck();
-                            deckBtnClicked.current = false;
-                          }}
-                        >
-                  <Card  cardData={new CardData({ cardImageUrl: CardBack })} />
-                </button>
-
+            <div
+              style={{ zIndex: "2", backgroundColor: "#053C61" }}
+              className={
+                "z-10 " +
+                (gameOver.current ? " hidden " : "") +
+                (deckBtnClicked.current && turn === "player1"
+                  ? "glowOutline"
+                  : "")
+              }
+            >
+              <button
+                id={"deck-btn"}
+                ref={deckBtnClicked}
+                disabled={
+                  turn === "player1" && deckBtnClicked.current ? false : true
+                }
+                onClick={() => {
+                  drawCardFromDeck();
+                  deckBtnClicked.current = false;
+                }}
+              >
+                <Card cardData={new CardData({ cardImageUrl: CardBack })} />
+              </button>
             </div>
-            <div className={"text-center z-10 md:text-2xl"} >
-              <div className={"rules-modal" + (gameOver.current  ? " hidden" : "")}>
-                <button onClick={() => {setShowRulesModal(true)}}>
+            <div className={"text-center z-10 md:text-2xl"}>
+              <div
+                className={"rules-modal" + (gameOver.current ? " hidden" : "")}
+              >
+                <button
+                  onClick={() => {
+                    setShowRulesModal(true);
+                  }}
+                >
                   Rules
                   {/* rules modal? */}
                 </button>
-                <RulesModal showModal={showRulesModal} setShowModal={setShowRulesModal}/>
+                <RulesModal
+                  showModal={showRulesModal}
+                  setShowModal={setShowRulesModal}
+                />
               </div>
-              <div className={"grid grid-rows-3 gap-4 place-items-center end-game-buttons" + (gameOver.current  ? "" : " hidden") }>
+              <div
+                className={
+                  "grid grid-rows-3 gap-4 place-items-center end-game-buttons" +
+                  (gameOver.current ? "" : " hidden")
+                }
+              >
                 <button
-                    className={"p-1 rounded-sm outline-none outline-white bg-indigo-blue"}
-                    onClick={() => {
-                      setHasOpponent(false)
-                      window.history.replaceState(null, 'home', '/')
-                      window.location.reload(true)
-                    }}
-                  >
+                  className={
+                    "p-1 rounded-sm outline-none outline-white bg-indigo-blue"
+                  }
+                  onClick={() => {
+                    setHasOpponent(false);
+                    window.history.replaceState(null, "home", "/");
+                    window.location.reload(true);
+                  }}
+                >
                   Home
                 </button>
-                {gameState.p2Scores[3] > gameState.p1Scores[3] ? "Opponent Wins!": gameState.p2Scores[3] === gameState.p1Scores[3]? "Tie" : "You Win!"}
+                {gameState.p2Scores[3] > gameState.p1Scores[3]
+                  ? "Opponent Wins!"
+                  : gameState.p2Scores[3] === gameState.p1Scores[3]
+                  ? "Tie"
+                  : "You Win!"}
                 <button
-                  className={"p-1 rounded outline-none outline-white bg-indigo-blue"}
+                  className={
+                    "p-1 rounded outline-none outline-white bg-indigo-blue"
+                  }
                   onClick={() => {
                     socket.emit("reqRestart", room);
                   }}
@@ -508,7 +566,7 @@ const Game = () => {
                 </button>
               </div>
             </div>
-            <div className={"" + (gameOver.current  ? " hidden" : "")}>
+            <div className={"" + (gameOver.current ? " hidden" : "")}>
               <button
                 className={
                   "transition outline-none outline-white ease-in-out" +
@@ -537,12 +595,9 @@ const Game = () => {
             gameState={gameState}
           />
         </div>
-        
       </div>
     </div>
   );
 };
 
 export default Game;
-
-
