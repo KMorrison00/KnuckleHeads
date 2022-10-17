@@ -8,14 +8,18 @@ import { createDeck, drawCard, shuffleDeck } from "./Api";
 import { ChooseCardModal } from "./ChooseCardModal";
 import { CardData, getCardValueFromCode } from "./Constants";
 import { Fireworks } from "./Fireworks";
+import { Stars } from './Stars'
 import { random } from "./Utils";
 import io from "socket.io-client";
 import { useLocation } from "react-router-dom";
 import { RulesModal } from "./RulesModal";
 
-const socket = io("https://knuckleheads-socket-server.glitch.me", {});
+// timer mode??
+
+
+// const socket = io("https://knuckleheads-socket-server.glitch.me", {});
 // local dev socket server
-// const socket = io("http://localhost:4000", {}); 
+const socket = io("http://localhost:4000", {}); 
 
 const initGrid = () => {
   let initGrid = [[], [], []];
@@ -51,8 +55,7 @@ const Game = () => {
   const [turn, setTurn] = useState("player1");
   const [deckId, setDeckId] = useState(null);
   const deckIsCreated = useRef(false);
-  const deckBtnRef = useRef();
-  // ADD RESHUFFLING OF DECK AT SOME POINT
+  const deckBtnClicked = useRef(false);
   const [gameState, setGameState] = useState(new GameObj());
   const [acePlayed, setAcePlayed] = useState(false);
   const [hasOpponent, setHasOpponent] = useState(false);
@@ -62,6 +65,7 @@ const Game = () => {
   const [showRulesModal, setShowRulesModal] = useState(false);
   const [reset, setReset] = useState(false);
   const gameOver = useRef(false);
+  const [linkCopied, setlinkCopied] = useState(false);
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const paramsRoom = params.get("room");
@@ -83,7 +87,6 @@ const Game = () => {
       setGameState(new GameObj());
       setDrawnCardState(new CardData());
       setChoosingGridSpot(false);
-      setTurn("player1");
       gameOver.current = false;
       setReset(false)
     };
@@ -302,12 +305,11 @@ const Game = () => {
   useEffect(
     () => {
       if (turn === 'player1') {
-        deckBtnRef.current = true;
+        deckBtnClicked.current = true;
       }
       // check if game is over
       if (isGameOver()) {
         setChoosingGridSpot(false);
-        setTurn("");
         gameOver.current = true
       }
     },
@@ -376,16 +378,26 @@ const Game = () => {
                     Send This Link To a Friend!:
                   </div>
                   <div className="flex flex-row gap-2">
-                    {/* this icon isnt rendering :( */}
-                    {window.location.href}?room={room}
-                    <button className="h-8 w-8 p-1" onClick={() =>  navigator.clipboard.writeText(`${window.location.href}?room=${room}`)}>
-                        <img  src={require('./images/copy-content.png')} alt='copy content'></img>
+                    <button className="flex flex-row gap-2" onClick={() =>  {
+                      navigator.clipboard.writeText(`${window.location.href}?room=${room}`)
+                      setlinkCopied(true);
+                    }}>
+                        {window.location.href}?room={room}
+                      <div>
+                        <img className="h-8 w-8 p-1" 
+                          src={require('./images/copy-content.png')} alt='copy content'></img>
+                      </div>
                       </button>
+                    <img className={"h-8 w-8 p-1 " + (linkCopied ? '':'hidden')} 
+                          src={require('./images/Checkmark.png')} alt='checkmark'></img>
                   </div>
                   <div>
                     <button
                         className={"" + (share ? "" : " hidden")}
-                        onClick={() => setShare(!share)}
+                        onClick={() => {
+                          setShare(!share)
+                          setlinkCopied(!linkCopied)
+                        }}
                         >
                         Back
                     </button>
@@ -405,7 +417,12 @@ const Game = () => {
         </div>
       </div>
       <div className={"z-0" + (isGameOver() ? "" : " hidden")}>
-        <Fireworks />
+        {gameState.p1Scores[3] > gameState.p2Scores[3] ? (
+          <Fireworks />
+        ) : (
+          <Stars />
+        )}
+        
       </div>
       <div
         className={
@@ -446,16 +463,20 @@ const Game = () => {
         <div className={"non-player-objects z-20 md:col-start-2 text-inherit p-2"}>
           {/* Draw/Discard piles */}
           <div className="grid grid-cols-1 gap-12 place-items-center">
-            <div className={"" + (gameOver.current  ? " hidden" : "")}>
-              <button id={"deck-btn"} ref={deckBtnRef} disabled={turn==='player1' &&
-                                                     deckBtnRef.current ? false:true}
-                onClick={() => {
-                  drawCardFromDeck();
-                  deckBtnRef.current = false;
-                }}
-              >
-                <Card cardData={new CardData({ cardImageUrl: CardBack })} />
-              </button>
+            {/* make glow */}
+            <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} 
+                  className={"z-10 " + (gameOver.current  ? " hidden " : "") + 
+                    (deckBtnClicked.current && turn==='player1' ? 'glowOutline' : '')}>
+                <button id={"deck-btn"} ref={deckBtnClicked} 
+                  disabled={turn==='player1' && deckBtnClicked.current ? false:true}
+                  onClick={() => {
+                            drawCardFromDeck();
+                            deckBtnClicked.current = false;
+                          }}
+                        >
+                  <Card  cardData={new CardData({ cardImageUrl: CardBack })} />
+                </button>
+
             </div>
             <div className={"text-center z-10 md:text-2xl"} >
               <div className={"rules-modal" + (gameOver.current  ? " hidden" : "")}>
