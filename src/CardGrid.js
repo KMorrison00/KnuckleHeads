@@ -54,11 +54,11 @@ export const CardGrid = ({ choosingGridSpot, opponentsTurn, setAcePlayed,
     }, [editedCard]);
 
 
-    return (<div className={"grid grid-rows-1 gap-4 z-10"}>
+    return (<div className={"grid grid-rows-1 gap-4 z-10 " + (opponentsTurn ? '' : 'glowOutline')}>
         {
         gameState.p1Cards.map(
             (column, i) => (
-                <div className={"grid grid-cols-3 gap-4 " + (opponentsTurn ? '' : 'glowOutline')} key={`row${i}`}>
+                <div className={"grid grid-cols-3 gap-4 "} key={`row${i}`}>
                     {column.map(
                         (card, j) => (
                             <div style={{"zIndex" : "2", backgroundColor:'#053C61'}} 
