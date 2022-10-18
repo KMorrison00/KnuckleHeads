@@ -12,13 +12,12 @@ export const ChooseCardModal = ({aceColumn, gameState, setGameState, endTurn, se
             for (let i = 0; i< 3; i++) {
                 if (gameState.p2Cards[i][aceColumn].cardVal) {
                     output.push(
-                    <div>
-                        <Card cardData={gameState.p2Cards[i][aceColumn]}
+                        <Card key={`${i}`}
+                              cardData={gameState.p2Cards[i][aceColumn]}
                               clickCondition={true}
                               potentialCard={gameState.p2Cards[i][aceColumn]}
                               setEditedCard={setSelection}
                               className={gameState.p2Cards[i][aceColumn].cardVal}/>
-                    </div>
                 );
             }
         }
